@@ -1,0 +1,42 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://39.108.93.65:3306/teamplus?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password: WkdGbmIyNW5jbVZ1T0E9PQ==
+  mvc:
+    format:
+      date: yyyy-MM-dd
+  thymeleaf:
+    cache: false
+    encoding: UTF-8
+    servlet:
+      content-type: text/html; charset=utf-8
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count==countSql
+  page-size-zero: true
+
+mybatis:
+  config-location: classpath:mybatis/mybatis-config.xml
+  mapper-locations: classpath:mybatis/mapper/*.xml
+
+teamplus:
+  login:
+    salt: ZGFnb25ncmVuOA==  # 用于密码生成的salt
+    check: true  # 是否进行登录验证，测试阶段可设置为false
+  bce:
+    endPoint: gz.bcebos.com
+    accessKey: 55b6431eba4b42f586b233fc528a1bfb
+    secretKey: db2c386d52c7418c87f292b75e3288af
+    bucketName: teamplus
+    cdnURL: https://teamplus.cdn.bcebos.com/
+  neo4j:
+    bolt: bolt://39.108.93.65:7687
+    http: http://39.108.93.65:7474
+    database: neo4j
+    username: neo4j
+    password: 123456

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+
+    <title>工作台</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/plugins/fontawesome-free/css/all.min.css}">
+    <!-- Theme style -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/dist/css/adminlte.min.css}">
+    <!-- fullCalendar 5.0.1 -->
+    <link rel="stylesheet" th:href="@{/webjars/fullcalendar/5.0.1/main.css}">
+</head>
+
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <div th:replace="/common/nav::nav"></div>
+
+    <!-- Main Sidebar Container -->
+    <div th:replace="/common/sidebar_main::sidebar ('schedule', ${team})"></div>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">日程</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">个人主页</a></li>
+                            <li class="breadcrumb-item active">日程规划</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card card-primary">
+                            <div class="card-body p-0">
+                                <!-- THE CALENDAR -->
+                                <div id='calendar'></div>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    <div th:replace="/common/footer::footer"></div>
+</div>
+<!-- ./wrapper -->
+
+<!-- REQUIRED SCRIPTS -->
+
+<!-- jQuery -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/jquery/jquery.min.js}"></script>
+<!-- Bootstrap 4 -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<!-- AdminLTE App -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/dist/js/adminlte.min.js}"></script>
+
+<!-- fullCalendar 2.2.5 -->
+<script th:src="@{/webjars/fullcalendar/5.0.1/main.js}"></script>
+<!-- Notification Count Update -->
+<script th:src="@{/js/notification.js}"></script>
+<script>
+    function dateFormat(fmt, date) {
+        let ret;
+        const opt = {
+            "Y+": date.getFullYear().toString(),        // 年
+            "m+": (date.getMonth() + 1).toString(),     // 月
+            "d+": date.getDate().toString(),            // 日
+            "H+": date.getHours().toString(),           // 时
+            "M+": date.getMinutes().toString(),         // 分
+            "S+": date.getSeconds().toString()          // 秒
+        };
+        for (let k in opt) {
+            ret = new RegExp("(" + k + ")").exec(fmt);
+            if (ret) {
+                fmt = fmt.replace(ret[1], (ret[1].length == 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, "0")))
+            }
+            ;
+        }
+        ;
+        return fmt;
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        $.ajax({
+            url: "/user/events",
+            dataType: "json",
+            async: true,
+            type: "GET",
+            success: function (req) {
+                console.log(req);
+
+                var calendarEl = document.getElementById('calendar');
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialDate: dateFormat("YYYY-mm-dd", new Date()),
+                    editable: false,
+                    selectable: true,
+                    businessHours: true,
+                    dayMaxEvents: true,
+                    events: req
+                });
+                calendar.render();
+
+                console.log(calendar);
+            }
+        });
+    });
+</script>
+
+</body>
+
+</html>

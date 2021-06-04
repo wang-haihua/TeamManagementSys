@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.dagongren8.teamplus.mapper.DirectoryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.dagongren8.teamplus.entity.Directory">
+        <id column="directory_id" property="directoryId" />
+        <result column="directory_name" property="directoryName" />
+        <result column="directory_parent_id" property="directoryParentId" />
+        <result column="directory_createtime" property="directoryCreatetime" />
+        <result column="directory_updatetime" property="directoryUpdatetime" />
+        <result column="directory_remark" property="directoryRemark" />
+        <result column="directory_delete_flag" property="directoryDeleteFlag" />
+        <association property="directoryCreator" javaType="cn.dagongren8.teamplus.entity.User">
+            <id column="user_id" property="userId"/>
+            <result column="user_name" property="userName"/>
+            <result column="user_password" property="userPassword"/>
+            <result column="user_avatar" property="userAvatar"/>
+            <result column="user_email" property="userEmail"/>
+            <result column="team_authority" property="teamAuthority"/>
+            <result column="user_createtime" property="userCreatetime"/>
+        </association>
+    </resultMap>
+
+    <select id="getAllChildDirectories" resultMap="BaseResultMap">
+        SELECT *
+        FROM directory
+                 left join user u on directory.directory_creator = u.user_id
+        where directory_parent_id = #{directoryId}
+    </select>
+    <select id="getDirectoryById" resultMap="BaseResultMap">
+        SELECT *
+        FROM directory
+                 left join user u on directory.directory_creator = u.user_id
+        where directory_id = #{directoryId}
+    </select>
+
+    <insert id="insertDirectory" useGeneratedKeys="true" keyProperty="directoryId">
+        INSERT INTO directory(directory_name, directory_parent_id, directory_fullpath, directory_creator,
+                              directory_updater, directory_remark, directory_delete_flag)
+        VALUES (#{directoryName}, #{directoryParentId}, #{directoryFullpath}, #{directoryCreator.userId},
+                #{directoryUpdater.userId}, #{directoryRemark}, #{directoryDeleteFlag})
+    </insert>
+    <update id="updateDirectoryById" keyProperty="directoryId">
+        UPDATE directory
+        SET directory_name        = #{directoryName},
+            directory_parent_id   = #{directoryParentId},
+            directory_fullpath    = #{directoryFullpath},
+            directory_creator     = #{directoryCreator.userId},
+            directory_updater     = #{directoryUpdater.userId},
+            directory_remark      = #{directoryRemark},
+            directory_delete_flag = #{directoryDeleteFlag}
+        WHERE directory_id = #{directoryId}
+    </update>
+    <delete id="deleteTeamById">
+        DELETE
+        FROM directory
+        WHERE directory_id = #{directoryId}
+    </delete>
+
+</mapper>

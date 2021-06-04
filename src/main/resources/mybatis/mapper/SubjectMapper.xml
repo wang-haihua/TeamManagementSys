@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.dagongren8.teamplus.mapper.SubjectMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.dagongren8.teamplus.entity.Subject">
+        <id column="subject_id" property="subjectId"/>
+        <result column="subject_name" property="subjectName"/>
+        <result column="subject_identification" property="subjectIdentification"/>
+        <result column="subject_description" property="subjectDescription"/>
+        <result column="subject_status" property="subjectStatus"/>
+        <result column="subject_avatar" property="subjectAvatar"/>
+        <result column="subject_createtime" property="subjectCreatetime"/>
+        <association property="directory" javaType="cn.dagongren8.teamplus.entity.Directory">
+            <id column="directory_id" property="directoryId"/>
+            <result column="directory_name" property="directoryName"/>
+            <result column="directory_parent_id" property="directoryParentId"/>
+            <result column="directory_fullpath" property="directoryFullpath"/>
+            <!--<result column="directory_creator" property="directoryCreator" />-->
+            <!--<result column="directory_updater" property="directoryUpdater" />-->
+            <result column="directory_createtime" property="directoryCreatetime"/>
+            <result column="directory_updatetime" property="directoryUpdatetime"/>
+            <result column="directory_remark" property="directoryRemark"/>
+            <result column="directory_delete_flag" property="directoryDeleteFlag"/>
+        </association>
+    </resultMap>
+
+    <select id="getAllSubject" resultMap="BaseResultMap">
+        SELECT *
+        FROM subject
+    </select>
+    <select id="getSubjectById" resultMap="BaseResultMap">
+        SELECT *
+        FROM subject
+        WHERE subject_id = ${subjectId}
+    </select>
+    <select id="getSubjectByIdentification" resultMap="BaseResultMap">
+        SELECT *
+        FROM subject
+        WHERE subject_identification = #{subjectIdentification}
+    </select>
+    <insert id="insertSubject" useGeneratedKeys="true" keyProperty="subjectId">
+        INSERT INTO subject(directory_id, subject_name, subject_identification, subject_description, subject_status,
+                            subject_avatar)
+        VALUES (#{directory.directoryId}, #{subjectName}, #{subjectIdentification}, #{subjectDescription},
+                #{subjectStatus}, #{subjectAvatar})
+    </insert>
+    <update id="updateSubjectById" keyProperty="subjectId">
+        UPDATE subject
+        SET directory_id           = #{directory.directoryId},
+            subject_name           = #{subjectName},
+            subject_identification = #{subjectIdentification},
+            subject_description    = #{subjectDescription},
+            subject_status         = #{subjectStatus},
+            subject_avatar         = #{subjectAvatar}
+        WHERE subject_id = #{subjectId}
+    </update>
+    <delete id="deleteSubjectById">
+        DELETE
+        FROM subject
+        WHERE subject_id = ${subjectId}
+    </delete>
+
+</mapper>

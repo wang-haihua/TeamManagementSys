@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.dagongren8.teamplus.mapper.AnnouncementMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.dagongren8.teamplus.entity.Announcement">
+        <id column="announcement_id" property="announcementId"/>
+        <result column="announcement_content" property="announcementContent"/>
+        <result column="announcement_createtime" property="announcementCreatetime"/>
+        <association property="user" javaType="cn.dagongren8.teamplus.entity.User">
+            <id column="user_id" property="userId"/>
+            <result column="user_name" property="userName"/>
+            <result column="user_password" property="userPassword"/>
+            <result column="user_avatar" property="userAvatar"/>
+            <result column="user_email" property="userEmail"/>
+            <result column="team_authority" property="teamAuthority"/>
+            <result column="user_createtime" property="userCreatetime"/>
+        </association>
+        <association property="subject" javaType="cn.dagongren8.teamplus.entity.Subject">
+            <id column="subject_id" property="subjectId"/>
+            <result column="subject_name" property="subjectName"/>
+            <result column="subject_identification" property="subjectIdentification"/>
+            <result column="subject_description" property="subjectDescription"/>
+            <result column="subject_status" property="subjectStatus"/>
+            <result column="subject_avatar" property="subjectAvatar"/>
+            <result column="subject_createtime" property="subjectCreatetime"/>
+        </association>
+    </resultMap>
+
+    <select id="getAllAnnouncementOfSubject" resultMap="BaseResultMap">
+        SELECT *
+        FROM announcement
+                 natural join subject
+                 natural join user
+        where subject_id = #{subjectId}
+    </select>
+    <insert id="insertAnnouncement" useGeneratedKeys="true" keyProperty="announcementId">
+        INSERT INTO announcement(subject_id, user_id, announcement_content, announcement_createtime)
+        VALUES (#{subject.subjectId}, #{user.userId}, #{announcementContent}, #{announcementCreatetime})
+    </insert>
+    <update id="updateAnnouncement" keyProperty="announcementId">
+        UPDATE announcement
+        SET subject_id              = #{subject.subjectId},
+            user_id                 = #{user.userId},
+            announcement_content    = #{announcementContent},
+            announcement_createtime = #{announcementCreatetime}
+        WHERE announcement_id = #{announcementId}
+    </update>
+    <delete id="deleteAnnouncementById">
+        DELETE
+        FROM announcement
+        WHERE announcement_id = ${announcementId}
+    </delete>
+
+</mapper>

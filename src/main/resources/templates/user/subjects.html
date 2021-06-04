@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+
+    <title>工作台</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/plugins/fontawesome-free/css/all.min.css}">
+    <!-- Theme style -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/dist/css/adminlte.min.css}">
+</head>
+
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <div th:replace="/common/nav::nav"></div>
+
+    <!-- Main Sidebar Container -->
+    <div th:replace="/common/sidebar_main::sidebar ('subjects', ${team})"></div>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">课题</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">个人主页</a></li>
+                            <li class="breadcrumb-item active">课题查看页面</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">与你相关的课题</h3>
+                                <div class="card-tools">
+                                    <ul class="pagination pagination-sm">
+                                        <li class="page-item"><a class="page-link" href="#"
+                                                                 th:href="@{/subjects(pageIndex=${subjects.pageNum - 1})}">«</a>
+                                        </li>
+                                        <th:block th:each="nav : ${subjects.navigatepageNums}">
+                                            <li class="page-item" th:classappend="${nav==subjects.pageNum?'active':''}">
+                                                <a class="page-link" href="#"
+                                                   th:href="@{/subjects(pageIndex=${nav})}"
+                                                   th:text="${nav}">1</a></li>
+                                        </th:block>
+                                        <li class="page-item"><a class="page-link" href="#"
+                                                                 th:href="@{/subjects(pageIndex=${subjects.pageNum + 1})}">»</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table projects">
+                                    <thead>
+                                    <tr>
+                                        <th style="width: 1%">
+                                            #
+                                        </th>
+                                        <th class="text-center" style="width: 3%">
+                                            头像
+                                        </th>
+                                        <th style="width: 20%">
+                                            课题名称
+                                        </th>
+                                        <th style="width: 30%">
+                                            课题成员
+                                        </th>
+                                        <th class="text-center" style="width: 8%">
+                                            状态
+                                        </th>
+                                        <th style="width: 10%">
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="s, stat : ${subjects.list}">
+                                        <td th:text="${stat.index + 1} + '.'">
+                                            1.
+                                        </td>
+                                        <td>
+                                            <img class="table-avatar"
+                                                 th:src="@{${#objects.nullSafe(s.getSubject().getSubjectAvatar(), '/img/user1.png')}}">
+                                        </td>
+                                        <td>
+                                            <a th:text="${s.getSubject().getSubjectName()}">
+                                                AdminLTE v3
+                                            </a>
+                                            <br>
+                                            <small>
+                                                创建于 <span
+                                                    th:text="${#dates.format(s.getSubject().getSubjectCreatetime(), 'yyyy/MM/dd')}"></span>
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <ul class="list-inline">
+                                                <li class="list-inline-item"
+                                                    th:each="sa : ${s.getSubject().getSubjectAuthorities().size() < 6 ? s.getSubject().getSubjectAuthorities() : s.getSubject().getSubjectAuthorities().subList(0, 5)}">
+                                                    <img class="table-avatar" th:alt="${sa.getUser().getUserName()}"
+                                                         th:src="@{${#objects.nullSafe(sa.getUser().getUserAvatar(), '/img/user1.png')}}"
+                                                         th:title="${sa.getUser().getUserName()}">
+                                                </li>
+                                                <span th:if="${s.getSubject().getSubjectAuthorities().size() >= 6}"
+                                                      th:text="'(+' + ${s.getSubject().getSubjectAuthorities().size() - 5} + ')'"></span>
+                                            </ul>
+                                        </td>
+                                        <td class="project-state">
+                                            <span class="badge badge-info"
+                                                  th:if="${s.getSubject().getSubjectStatus() == 0}">未启动</span>
+                                            <span class="badge badge-warning"
+                                                  th:if="${s.getSubject().getSubjectStatus() == 1}">进行中</span>
+                                            <span class="badge badge-success"
+                                                  th:if="${s.getSubject().getSubjectStatus() == 2}">已完成</span>
+                                            <span class="badge badge-secondary"
+                                                  th:if="${s.getSubject().getSubjectStatus() == 3}">已废弃</span>
+                                        </td>
+                                        <td class="project-actions text-right">
+                                            <a class="btn btn-primary btn-sm"
+                                               th:href="@{'/s/' + ${s.getSubject().getSubjectIdentification()}}">
+                                                <i class="fas fa-folder">
+                                                </i>
+                                                查看
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <p class="text-gray text-center mt-5 mb-5" th:if="${subjects.list.size() == 0}">
+                                    暂无课题，您可以创建新课题，或者联系课题管理员将您添加进课题。</p>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer clearfix">
+                                <a class="btn btn-info float-right" th:href="@{/subjects/add}">
+                                    <i class="fas fa-plus"></i> 添加课题
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.content-wrapper -->
+    <!-- Main Footer -->
+    <div th:replace="/common/footer::footer"></div>
+</div>
+<!-- ./wrapper -->
+
+<!-- REQUIRED SCRIPTS -->
+
+<!-- jQuery -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/jquery/jquery.min.js}"></script>
+<!-- Bootstrap 4 -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<!-- AdminLTE App -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/dist/js/adminlte.min.js}"></script>
+<!-- Notification Count Update -->
+<script th:src="@{/js/notification.js}"></script>
+</body>
+
+</html>

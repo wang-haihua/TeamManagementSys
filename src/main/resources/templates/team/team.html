@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+
+    <title>课题组信息维护</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/plugins/fontawesome-free/css/all.min.css}">
+    <!-- Theme style -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/dist/css/adminlte.min.css}">
+    <!-- Select2 -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/plugins/select2/css/select2.min.css}">
+</head>
+
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <div th:replace="/common/nav::nav"></div>
+
+    <!-- Main Sidebar Container -->
+    <div th:replace="/common/sidebar_main::sidebar ('setting-team-info', ${team})"></div>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">课题组信息维护</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">个人主页</a></li>
+                            <li class="breadcrumb-item active">课题组信息维护</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-3">
+
+                        <!-- Profile Image -->
+                        <div class="card card-primary card-outline">
+                            <div class="card-body box-profile">
+                                <div class="text-center">
+                                    <img alt="User profile picture" class="profile-user-img img-fluid img-circle"
+                                         id="imgAvatar"
+                                         th:src="@{${#objects.nullSafe(team.getTeamAvatar(), '/img/user1.png')}}">
+                                </div>
+
+                                <h3 class="profile-username text-center" th:text="${team.getTeamName()}">课题组名称</h3>
+                                <hr>
+                                <strong>课题组标识</strong>
+
+                                <p class="text-muted" th:text="${team.getTeamIdentification()}">
+                                    dagongren8
+                                </p>
+
+                                <hr>
+
+                                <strong>课题组创建时间</strong>
+
+                                <p class="text-muted"
+                                   th:text="${#dates.format(team.getTeamCreatetime(), 'yyyy/MM/dd')}">2021年1月11日</p>
+
+                                <hr>
+
+                                <strong>课题组简介</strong>
+
+                                <p class="text-muted" th:text="${team.getTeamDescription()}">
+                                    我是课题组描述，我是课题组简介，我是课题组相关介绍，我是一堆废话。
+                                </p>
+
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-md-9">
+                        <div class="card">
+                            <div class="card-header p-2">
+                                <ul class="nav nav-pills">
+                                    <li class="nav-item"><a class="nav-link" data-toggle="tab"
+                                                            href="#basic-settings"
+                                                            th:classappend="${#objects.nullSafe(tab, 1) == 1 ? 'active' : ''}">基本设置</a>
+                                    </li>
+                                    <li class="nav-item" th:if="${user.getTeamAuthority() != 0}"><a class="nav-link" data-toggle="tab"
+                                                            href="#advanced-settings"
+                                                            th:classappend="${#objects.nullSafe(tab, 1) == 2 ? 'active' : ''}">高级设置</a>
+                                    </li>
+                                </ul>
+                            </div><!-- /.card-header -->
+                            <div class="card-body">
+                                <div class="tab-content">
+                                    <div class="tab-pane" id="basic-settings"
+                                         th:classappend="${#objects.nullSafe(tab, 1) == 1 ? 'active' : ''}">
+                                        <form class="form-horizontal" method="post" th:action="@{/team/info}">
+                                            <input name="teamId" th:value="${team.getTeamId()}" type="hidden">
+                                            <div class="form-group row">
+                                                <label class="col-sm-10 col-form-label" for="teamName">课题组名称</label>
+                                                <div class="col-sm-12">
+                                                    <input class="form-control" id="teamName" name="teamName"
+                                                           placeholder="我是课题组名称"
+                                                           th:value="${inputTeamName != null ? inputTeamName : team.getTeamName()}"
+                                                           type="text">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-sm-10 col-form-label"
+                                                       for="teamIdentifier">课题组标识</label>
+                                                <div class="col-sm-12">
+                                                    <input class="form-control" id="teamIdentifier"
+                                                           name="teamIdentifier"
+                                                           placeholder="我是课题组标识"
+                                                           th:value="${inputTeamIdentifier != null ? inputTeamIdentifier : team.getTeamIdentification()}"
+                                                           type="text">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-sm-10 col-form-label"
+                                                       for="teamDescription">课题组简介</label>
+                                                <div class="col-sm-12">
+                                                    <textarea class="form-control" id="teamDescription"
+                                                              name="teamDescription"
+                                                              placeholder="简要介绍一下你的课题组"
+                                                              th:text="${inputTeamDescription != null ? inputTeamDescription : team.getTeamDescription()}"></textarea>
+                                                </div>
+                                            </div>
+                                            <p class="text-danger" th:if="${error_info}" th:text="${error_info}"></p>
+                                            <div class="form-group row" th:if="${user.getTeamAuthority() != 0}">
+                                                <div class="col-sm-10">
+                                                    <button class="btn btn-danger" style="width: 150px;" type="submit">
+                                                        确认修改
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <!-- /.tab-pane -->
+                                    <div class="tab-pane" id="advanced-settings"
+                                         th:classappend="${#objects.nullSafe(tab, 1) == 2 ? 'active' : ''}">
+                                            <div class="form-group row">
+                                                <label class="col-sm-10 col-form-label"
+                                                       for="inviteMember">成员邀请链接</label>
+                                                <div class="col-sm-12">
+                                                    <p id="inviteMember"
+                                                       th:text="${team.isInviteTokenEnabled() ? 'http://localhost:8080/invite/' + team.getTeamIdentification() + '?token=' + team.getInviteToken() : '邀请链接未启用，请点击生成邀请链接按钮。'}">
+                                                        未启用，请点击生成邀请链接按钮。</p>
+                                                    <p th:if="${team.isInviteTokenEnabled()}">您可以将邀请链接分享给成员进行注册。</p>
+                                                </div>
+                                                <div class="col-sm-12">
+                                                    <a class="btn btn-primary text-white" style="width: 150px;"
+                                                       th:href="@{/team/info/invite/enable}"
+                                                       th:text="${team.isInviteTokenEnabled() ? '重置邀请链接' : '生成邀请链接'}">
+                                                        生成邀请链接
+                                                    </a>
+                                                    <a class="btn btn-danger text-white" style="width: 150px;"
+                                                       th:href="@{/team/info/invite/disable}"
+                                                       th:if="${team.isInviteTokenEnabled()}">
+                                                        停用邀请链接
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                            <hr>
+
+                                            <div class="form-group row">
+                                                <label class="col-sm-10 col-form-label" for="transferTeam">转让课题组</label>
+                                                <div class="col-sm-12">
+                                                    <p id="transferTeam">
+                                                        转让课题组后，您将指定该课题组的新创始人，并将本账号降级为管理员。此操作无法撤消，请谨慎。</p>
+                                                </div>
+                                                <div class="col-sm-12">
+                                                    <button class="btn btn-danger" data-target="#teamTransfer"
+                                                            data-toggle="modal"
+                                                            style="width: 150px;">
+                                                        转让课题组
+                                                    </button>
+                                                    <div aria-hidden="true" aria-labelledby="transferModalLabel"
+                                                         class="modal fade" id="teamTransfer" role="dialog"
+                                                         tabindex="-1">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h4 class="modal-title" id="transferModalLabel">
+                                                                        转让课题组</h4>
+                                                                    <button aria-hidden="true" class="close"
+                                                                            data-dismiss="modal" type="button">&times;
+                                                                    </button>
+                                                                </div>
+                                                                <form method="post" th:action="@{/team/transfer}">
+
+                                                                    <div class="modal-body">
+                                                                        请选择新的创建者：
+                                                                        <select class="form-control select2"
+                                                                                name="toUserId" style="width: 100%;">
+                                                                            <option th:each="u:${teamUsers}"
+                                                                                    th:text="${u.getUserName()}"
+                                                                                    th:value="${u.getUserId()}">刘思齐
+                                                                            </option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <a class="btn btn-primary text-white"
+                                                                           data-dismiss="modal">取消</a>
+                                                                        <button class="btn btn-danger text-white"
+                                                                                type="submit">确认
+                                                                        </button>
+                                                                    </div>
+                                                                </form>
+                                                            </div><!-- /.modal-content -->
+                                                        </div><!-- /.modal -->
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <hr>
+                                            <div class="form-group row">
+                                                <label class="col-sm-10 col-form-label" for="disbandTeam">解散课题组</label>
+                                                <div class="col-sm-12">
+                                                    <p id="disbandTeam">
+                                                        解散课题组后，您将无法再次以该账号登录该课题组，您将丢失该账号下所有存储数据。同时，该课题组所有数据都将丢失，请确认已经做好数据备份。此操作无法撤消，请谨慎。</p>
+                                                    <p class="text-danger" th:if="${delete_error}">删除课题失败，请输入正确的密码！</p>
+                                                </div>
+                                                <div class="col-sm-12">
+                                                    <button class="btn btn-danger" data-target="#deleteTask"
+                                                            data-toggle="modal"
+                                                            style="width: 150px;">
+                                                        解散课题组
+                                                    </button>
+                                                    <div aria-hidden="true" aria-labelledby="deleteModalLabel"
+                                                         class="modal fade" id="deleteTask" role="dialog" tabindex="-1">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h4 class="modal-title" id="deleteModalLabel">
+                                                                        解散课题组</h4>
+                                                                    <button aria-hidden="true" class="close"
+                                                                            data-dismiss="modal" type="button">&times;
+                                                                    </button>
+                                                                </div>
+                                                                <form method="post" th:action="@{/team/delete}">
+
+                                                                    <div class="modal-body">
+                                                                        此操作为危险操作，请输入登录密码以确定解散课题组：
+                                                                        <input name="password" type="password">
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <a class="btn btn-primary text-white"
+                                                                           data-dismiss="modal">取消</a>
+                                                                        <button class="btn btn-danger text-white"
+                                                                                type="submit">确认
+                                                                        </button>
+                                                                    </div>
+                                                                </form>
+                                                            </div><!-- /.modal-content -->
+                                                        </div><!-- /.modal -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    </div>
+                                </div>
+                                <!-- /.tab-content -->
+                            </div><!-- /.card-body -->
+                        </div>
+                        <!-- /.nav-tabs-custom -->
+                    </div>
+                    <!-- /.col -->
+                </div>
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    <div th:replace="/common/footer::footer"></div>
+</div>
+<!-- ./wrapper -->
+
+<form enctype="multipart/form-data" id="formTeamAvatar" method="post" th:action="@{/team/info/avatar}">
+    <input accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" hidden id="inputTeamAvatar" name="teamAvatar"
+           type="file">
+</form>
+
+
+<!-- REQUIRED SCRIPTS -->
+
+<!-- jQuery -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/jquery/jquery.min.js}"></script>
+<!-- Bootstrap 4 -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<!-- AdminLTE App -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/dist/js/adminlte.min.js}"></script>
+<!-- Select2 -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/select2/js/select2.full.min.js}"></script>
+<link rel="stylesheet"
+      th:href="@{/webjars/AdminLTE/3.0.0/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
+<!-- Notification Count Update -->
+<script th:src="@{/js/notification.js}"></script>
+<script>
+    (function () {
+        $("#imgAvatar").click(function () {
+            $("#inputTeamAvatar").click();
+        });
+        $("#inputTeamAvatar").change(function (r) {
+
+            let size = r.target.files[0].size;
+            if (size >= 1024 * 1024) {
+                alert("头像大小不能大于1MB！");
+                target.value = "";
+                return false;
+            }
+
+            $("#formTeamAvatar").submit();
+        })
+    })();
+
+    $('.select2').select2({
+        theme: 'bootstrap4'
+    });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,30 @@
+package cn.dagongren8.teamplus.mapper;
+
+import cn.dagongren8.teamplus.entity.Document;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+/**
+ * <p>
+ *  Mapper 接口
+ * </p>
+ *
+ * @author wanghaihua
+ * @since 2021-01-12
+ */
+@Mapper
+public interface DocumentMapper {
+
+    List<Document> getAllDocuments(@Param("directoryId") int directoryId);
+
+    Document getDocumentById(int documentId);
+
+    int insertDocument(Document document);
+
+    int updateDocumentById(Document document);
+
+    int deleteDocumentById(int documentId);
+
+}

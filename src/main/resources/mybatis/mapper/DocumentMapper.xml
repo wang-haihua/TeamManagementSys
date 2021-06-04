@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.dagongren8.teamplus.mapper.DocumentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.dagongren8.teamplus.entity.Document">
+        <id column="document_id" property="documentId" />
+        <result column="document_name" property="documentName" />
+        <result column="document_key" property="documentKey"/>
+        <result column="document_createtime" property="documentCreatetime" />
+        <result column="document_type" property="documentType" />
+        <association property="directory" javaType="cn.dagongren8.teamplus.entity.Directory">
+            <id column="directory_id" property="directoryId" />
+            <result column="directory_name" property="directoryName" />
+            <result column="directory_parent_id" property="directoryParentId" />
+            <result column="directory_fullpath" property="directoryFullpath" />
+            <result column="directory_createtime" property="directoryCreatetime" />
+            <result column="directory_updatetime" property="directoryUpdatetime" />
+            <result column="directory_remark" property="directoryRemark" />
+            <result column="directory_delete_flag" property="directoryDeleteFlag" />
+        </association>
+        <association property="documentCreator" javaType="cn.dagongren8.teamplus.entity.User">
+            <id column="user_id" property="userId"/>
+            <result column="user_name" property="userName"/>
+            <result column="user_password" property="userPassword"/>
+            <result column="user_avatar" property="userAvatar"/>
+            <result column="user_email" property="userEmail"/>
+            <result column="team_authority" property="teamAuthority"/>
+            <result column="user_createtime" property="userCreatetime"/>
+        </association>
+    </resultMap>
+
+    <select id="getAllDocuments" resultMap="BaseResultMap">
+        SELECT *
+        FROM document
+                 left join directory on document.directory_id = directory.directory_id
+                 left join user u on document.document_creator = u.user_id
+        where document.directory_id = #{directoryId}
+    </select>
+    <select id="getDocumentById" resultMap="BaseResultMap">
+        SELECT *
+        FROM document
+                 left join directory on document.directory_id = directory.directory_id
+                 left join user u on document.document_creator = u.user_id
+        where document_id = #{document_id}
+    </select>
+
+    <insert id="insertDocument" useGeneratedKeys="true" keyProperty="documentId">
+        INSERT INTO document(directory_id, document_name, document_key, document_creator, document_type)
+        VALUES (#{directory.directoryId}, #{documentName}, #{documentKey}, #{documentCreator.userId}, #{documentType})
+    </insert>
+    <update id="updateDocumentById" keyProperty="documentId">
+        UPDATE document
+        SET directory_id     = #{directory.directoryId},
+            document_name    = #{documentName},
+            document_key     = #{documentKey},
+            document_creator = #{documentCreator.userId},
+            document_type    = #{documentType}
+        WHERE document_id = #{documentId}
+    </update>
+    <delete id="deleteDocumentById">
+        DELETE
+        FROM document
+        WHERE document_id = #{documentId}
+    </delete>
+
+</mapper>

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.dagongren8.teamplus.mapper.NotificationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.dagongren8.teamplus.entity.Notification">
+        <id column="notification_id" property="notificationId"/>
+        <result column="notification_content" property="notificationContent"/>
+        <result column="notification_title" property="notificationTitle"/>
+        <result column="notification_createtime" property="notificationCreatetime"/>
+        <result column="notification_type" property="notificationType"/>
+        <result column="notification_read" property="notificationRead"/>
+        <association property="user" javaType="cn.dagongren8.teamplus.entity.User">
+            <id column="user_id" property="userId"/>
+            <result column="user_name" property="userName"/>
+            <result column="user_password" property="userPassword"/>
+            <result column="user_avatar" property="userAvatar"/>
+            <result column="user_email" property="userEmail"/>
+            <result column="team_authority" property="teamAuthority"/>
+            <result column="user_createtime" property="userCreatetime"/>
+        </association>
+        <association property="notificationAnnouncer" javaType="cn.dagongren8.teamplus.entity.User">
+            <id column="notification_announcer" property="userId"/>
+            <!-- TODO announcer信息未实装 -->
+            <result column="u2.user_name" property="userName"/>
+            <result column="u2.user_password" property="userPassword"/>
+            <result column="u2.user_avatar" property="userAvatar"/>
+            <result column="u2.user_email" property="userEmail"/>
+            <result column="u2.team_authority" property="teamAuthority"/>
+            <result column="u2.user_createtime" property="userCreatetime"/>
+        </association>
+        <association property="subject" javaType="cn.dagongren8.teamplus.entity.Subject">
+            <id column="subject_id" property="subjectId"/>
+            <result column="subject_name" property="subjectName"/>
+            <result column="subject_identification" property="subjectIdentification"/>
+            <result column="subject_description" property="subjectDescription"/>
+            <result column="subject_createtime" property="subjectCreatetime"/>
+            <result column="subject_status" property="subjectStatus"/>
+            <result column="subject_avatar" property="subjectAvatar"/>
+        </association>
+    </resultMap>
+
+    <select id="getAllNotifications" resultMap="BaseResultMap">
+        SELECT *
+        FROM notification n
+                 left join user u on n.user_id = u.user_id
+                 left join subject s on n.subject_id = s.subject_id
+        where n.user_id = #{userId}
+        order by notification_id desc
+    </select>
+    <select id="getAllSystemNotifications" resultMap="BaseResultMap">
+        SELECT *
+        FROM notification n
+                 left join user u on n.user_id = u.user_id
+                 left join subject s on n.subject_id = s.subject_id
+        where n.user_id = #{userId}
+          and notification_type = 0
+        order by notification_id desc
+    </select>
+    <select id="getAllTeamNotifications" resultMap="BaseResultMap">
+        SELECT *
+        FROM notification n
+                 left join user u on n.user_id = u.user_id
+                 left join subject s on n.subject_id = s.subject_id
+        where n.user_id = #{userId}
+          and notification_type = 1
+        order by notification_id desc
+    </select>
+    <select id="getAllSubjectNotifications" resultMap="BaseResultMap">
+        SELECT *
+        FROM notification n
+                 left join user u on n.user_id = u.user_id
+                 left join subject s on n.subject_id = s.subject_id
+        where n.user_id = #{userId}
+          and notification_type = 2
+        order by notification_id desc
+    </select>
+    <select id="getSubjectNotifications" resultMap="BaseResultMap">
+        SELECT *
+        FROM notification n
+                 left join user u on n.user_id = u.user_id
+                 left join subject s on n.subject_id = s.subject_id
+        where n.user_id = #{userId}
+          and notification_type = 2
+          and n.subject_id = #{subjectId}
+        order by notification_id desc
+    </select>
+    <select id="getAllUnreadNotifications" resultMap="BaseResultMap">
+        SELECT *
+        FROM notification n
+                 left join user u on n.user_id = u.user_id
+                 left join subject s on n.subject_id = s.subject_id
+        where n.user_id = #{userId}
+          and notification_read = 0
+        order by notification_id desc
+    </select>
+    <select id="getNotificationById" resultMap="BaseResultMap">
+        SELECT *
+        FROM notification n
+                 left join user u on n.user_id = u.user_id
+                 left join subject s on n.subject_id = s.subject_id
+        WHERE notification_id = ${notificationId}
+    </select>
+    <select id="findNotificationsContains" resultMap="BaseResultMap">
+        SELECT *
+        FROM notification n
+                 left join user u on n.user_id = u.user_id
+                 left join subject s on n.subject_id = s.subject_id
+        WHERE n.user_id = #{userId}
+          and n.notification_content like '%${query}%'
+        order by notification_id desc
+    </select>
+    <insert id="insertNotification" useGeneratedKeys="true" keyProperty="notificationId">
+        INSERT INTO notification(user_id, notification_content, notification_title, notification_announcer,
+                                 notification_read, notification_type, subject_id)
+        VALUES (#{user.userId}, #{notificationContent}, #{notificationTitle}, #{notificationAnnouncer.userId},
+                #{notificationRead}, #{notificationType}, #{subject.subjectId})
+    </insert>
+    <update id="updateNotification" keyProperty="notificationId">
+        UPDATE notification
+        SET user_id                = #{user.userId},
+            notification_content   = #{notificationContent},
+            notification_title     = #{notificationTitle},
+            notification_announcer = #{notificationAnnouncer.userId},
+            notification_read      = #{notificationRead},
+            notification_type      = #{notificationType},
+            subject_id             = #{subject.subjectId}
+        WHERE notification_id = #{notificationId}
+    </update>
+    <update id="setAllAsRead" keyProperty="notificationId">
+        UPDATE notification
+        SET notification_read = 1
+        WHERE user_id = #{userId}
+    </update>
+    <delete id="deleteNotificationById">
+        DELETE
+        FROM notification
+        WHERE notification_id = #{notificationId}
+    </delete>
+    <select id="getUnreadNotificationCount" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM notification n
+                 left join user u on n.user_id = u.user_id
+                 left join subject s on n.subject_id = s.subject_id
+        where n.user_id = #{userId}
+          and n.notification_read = 0
+    </select>
+    <select id="getUnreadSystemNotificationCount" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM notification n
+                 left join user u on n.user_id = u.user_id
+                 left join subject s on n.subject_id = s.subject_id
+        where n.user_id = #{userId}
+          and n.notification_read = 0
+          and notification_type = 0
+    </select>
+    <select id="getUnreadTeamNotificationCount" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM notification n
+                 left join user u on n.user_id = u.user_id
+                 left join subject s on n.subject_id = s.subject_id
+        where n.user_id = #{userId}
+          and n.notification_read = 0
+          and notification_type = 1
+    </select>
+    <select id="getUnreadSubjectNotificationCount" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM notification n
+                 left join user u on n.user_id = u.user_id
+                 left join subject s on n.subject_id = s.subject_id
+        where n.user_id = #{userId}
+          and n.notification_read = 0
+          and notification_type = 2
+    </select>
+</mapper>

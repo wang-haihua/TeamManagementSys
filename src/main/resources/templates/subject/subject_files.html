@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+
+    <title>任务管理</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/plugins/fontawesome-free/css/all.min.css}">
+    <!-- Theme style -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/dist/css/adminlte.min.css}">
+</head>
+
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <div th:replace="/common/nav::nav"></div>
+
+    <!-- Main Sidebar Container -->
+    <div th:replace="/common/sidebar_subject::sidebar ('file', ${subject})"></div>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">文档管理</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">课题页面</a></li>
+                            <li class="breadcrumb-item active">文档管理</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header ui-sortable-handle" style="cursor: move;">
+                                <h3 class="card-title">
+                                    <ol class="breadcrumb"
+                                        style="background-color: white; margin-bottom: unset; padding: unset;">
+                                        <li class="breadcrumb-item"></li>
+                                        <li class="breadcrumb-item active" th:if="${path.size() == 1}">课题根目录</li>
+                                        <li class="breadcrumb-item" th:if="${path.size() > 1}">
+                                            <a th:href="@{'/s/' + ${subject.getSubjectIdentification()} + '/files/all/0'}">课题根目录</a>
+                                        </li>
+                                        <li class="breadcrumb-item"
+                                            th:each="p : ${path.size() > 2 ? path.subList(1, path.size() - 1) : path.subList(0, 0)}">
+                                            <a th:href="@{'/s/' + ${subject.getSubjectIdentification()} + '/files/all/' + ${p.getDirectoryId()}}"
+                                               th:text="${p.getDirectoryName()}">目录</a>
+                                        </li>
+                                        <li class="breadcrumb-item active" th:if="${path.size() > 1}"
+                                            th:text="${currentDirectory.getDirectoryName()}">文件夹1
+                                        </li>
+                                    </ol>
+                                </h3>
+
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body p-0">
+                                <table class="table projects">
+                                    <thead>
+                                    <tr>
+                                        <th>文件名</th>
+                                        <th style="width: 15%">创建人</th>
+                                        <th style="width: 20%">创建时间</th>
+                                        <th style="width: 100px"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="folder : ${directories}">
+                                        <td>
+                                            <img alt="文件夹" src="/img/file/folder.svg" width="38">
+                                            <a th:href="@{'/s/' + ${subject.getSubjectIdentification()} + '/files/all/' + ${folder.getDirectoryId()}}"
+                                               th:text="${folder.getDirectoryName()}">王海华写真集</a>
+                                        </td>
+                                        <td th:text="${folder.getDirectoryCreator() == null ? '' : folder.getDirectoryCreator().getUserName()}">
+                                            王海华
+                                        </td>
+                                        <td th:text="${#dates.format(folder.getDirectoryCreatetime(), 'yyyy年MM月dd日')}">
+                                            2021年1月21日
+                                        </td>
+                                        <td>
+                                            <a class="a-delete-file" href="#"
+                                               th:attr="idval=${folder.getDirectoryId()},idtype='directory'">删除</a>
+                                        </td>
+                                    </tr>
+                                    <tr th:each="doc : ${documents}">
+                                        <td>
+                                            <img alt="文件" src="/img/file/txt.svg" width="38">
+                                            <a th:href="@{'/s/' + ${subject.getSubjectIdentification()} + '/files/download/' + ${doc.getDocumentId()}}"
+                                               th:text="${doc.getDocumentName()}">王海华.jpg</a>
+                                        </td>
+                                        <td th:text="${doc.getDocumentCreator() == null ? '' : doc.getDocumentCreator().getUserName()}">
+                                            王海华
+                                        </td>
+                                        <td th:text="${#dates.format(doc.getDocumentCreatetime(), 'yyyy年MM月dd日')}">
+                                            2021/1/21
+                                        </td>
+                                        <td>
+                                            <a class="a-delete-file" href="#"
+                                               th:attr="idval=${doc.getDocumentId()},idtype='document'">删除</a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <p class="text-gray text-center mt-5 mb-5"
+                                   th:if="${directories.size() == 0 && documents.size() == 0}">
+                                    该文件夹暂无文件，您可以创建文件夹或上传文件。</p>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer clearfix">
+                                <button class="btn btn-info float-right" data-target="#createFolder"
+                                        data-toggle="modal">
+                                    <i class="fas fa-plus"></i> 新建文件夹
+                                </button>
+                                <div aria-hidden="true" aria-labelledby="createModalLabel"
+                                     class="modal fade" id="createFolder" role="dialog" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="createModalLabel">
+                                                    新建文件夹</h4>
+                                                <button aria-hidden="true" class="close"
+                                                        data-dismiss="modal" type="button">&times;
+                                                </button>
+                                            </div>
+                                            <form method="post"
+                                                  th:action="@{'/s/' + ${subject.getSubjectIdentification()} + '/files/addDirectory'}">
+                                                <input name="directoryId"
+                                                       th:value="${currentDirectory.getDirectoryId()}"
+                                                       type="hidden">
+                                                <div class="modal-body">
+                                                    请输入文件夹名称：
+                                                    <input name="directoryName" type="text">
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <a class="btn btn-secondary text-white"
+                                                       data-dismiss="modal">取消</a>
+                                                    <button class="btn btn-primary text-white"
+                                                            type="submit">确认
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div><!-- /.modal-content -->
+                                    </div><!-- /.modal -->
+                                </div>
+
+                                <button class="btn btn-info float-right mr-2" id="btnUpload">
+                                    <i class="fas fa-file-upload"></i> 上传文件
+                                </button>
+                                <form enctype="multipart/form-data" hidden id="formFileUpload" method="post"
+                                      th:action="@{'/s/' + ${subject.getSubjectIdentification()} + '/files/upload'}">
+                                    <input name="directoryId" th:value="${currentDirectory.getDirectoryId()}"
+                                           type="hidden">
+                                    <input id="inputFile" name="file" type="file">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    <div th:replace="/common/footer::footer"></div>
+</div>
+<!-- ./wrapper -->
+
+
+<!-- 文件删除表单 -->
+<form hidden id="formDeleteFile" method="post"
+      th:action="@{'/s/' + ${subject.getSubjectIdentification()} + '/files/delete'}">
+    <input id="inputIdToDelete" name="idToDelete" type="text">
+    <input id="inputType" name="type" type="text">
+    <input id="inputNavId" name="navId" th:value="${navId}" type="text">
+</form>
+
+<!-- REQUIRED SCRIPTS -->
+
+<!-- jQuery -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/jquery/jquery.min.js}"></script>
+<!-- Bootstrap 4 -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<!-- AdminLTE App -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/dist/js/adminlte.min.js}"></script>
+<!-- Notification Count Update -->
+<script th:src="@{/js/notification.js}"></script>
+
+<script>
+    (function () {
+        $("#btnUpload").click(function () {
+            $("#inputFile").click();
+        });
+        $("#inputFile").change(function (r) {
+
+            let size = r.target.files[0].size;
+            if (size >= 1024 * 1024 * 50) {
+                alert("文件大小不能大于50MB！");
+                target.value = "";
+                return false;
+            }
+
+            $("#formFileUpload").submit();
+        })
+    })();
+</script>
+
+
+<script>
+    $(function () {
+        $('.a-delete-file').click(function (e) {
+            $('#inputIdToDelete').val(e.target.getAttribute('idval'));
+            $('#inputType').val(e.target.getAttribute('idtype'));
+            $('#formDeleteFile').submit();
+        });
+    });
+</script>
+</body>
+
+</html>

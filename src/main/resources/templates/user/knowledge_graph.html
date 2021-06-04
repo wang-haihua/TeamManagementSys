@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+
+    <title>知识图谱</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/plugins/fontawesome-free/css/all.min.css}">
+    <!-- Theme style -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/dist/css/adminlte.min.css}">
+    <!-- popoto -->
+    <link rel="stylesheet" th:href="@{/js/node_modules/popoto/dist/popoto.min.css}">
+
+    <style>
+        #popoto-graph:fullscreen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-webkit-full-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-moz-full-screen {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popoto-graph:-ms-fullscreen {
+            width: 100%;
+            height: 100%;
+        }
+
+        .ppt-div-graph {
+            height: 100%;
+        }
+    </style>
+
+</head>
+
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <div th:replace="/common/nav::nav"></div>
+
+    <!-- Main Sidebar Container -->
+    <div th:replace="/common/sidebar_main::sidebar ('knowledge-graph', ${team})"></div>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">知识图谱</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">个人主页</a></li>
+                            <li class="breadcrumb-item active">知识图谱</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card card-primary card-outline">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="fas fa-edit"></i>
+                                    知识图谱功能说明
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info alert-dismissible">
+                                    <button aria-hidden="true" class="close" data-dismiss="alert" type="button">×
+                                    </button>
+                                    <h5><i class="icon fas fa-info"></i>提示</h5>
+                                    首次使用知识图谱模块时，请认真阅读操作说明，并按操作说明更新图数据库。
+                                </div>
+
+                                <dl>
+                                    <dt>功能介绍</dt>
+                                    <dd>本知识图谱模块可以使用图来直观展示课题组与课题的关系、课题组与成员的关系、课题与成员的关系。方便分析课题之间的关系以及成员之间的关系。</dd>
+                                    <dt>操作说明</dt>
+                                    <dd>
+                                        课题知识图谱模块在进行相应的查询操作之前，需要更新图数据库，根据最新的课题信息更新知识图谱。
+                                    </dd>
+                                    <dd>点击下方的"更新图数据库"按钮来更新图数据库，该操作大约需要10秒左右，请耐心等待。在更新图数据库期间不影响其他业务的正常运行。</dd>
+                                    <dt>使用知识图谱</dt>
+                                    <dd>更新图数据库之后，可以使用下面的"进入知识图谱"按钮来进入知识图谱查看页面。</dd>
+                                </dl>
+
+                                <button class="btn btn-primary" data-target="#modal-xl" data-toggle="modal"
+                                        onclick="setTimeout('popoto.tools.reset();', 300); " type="button">
+                                    进入知识图谱
+                                </button>
+                                <button class="btn btn-info ml-2" data-target="#modal-overlay" data-toggle="modal"
+                                        type="button">
+                                    更新图数据库
+                                </button>
+                                <span class="ml-3 text-gray">上次更新时间：<span th:text="${updateTime}"></span></span>
+                            </div>
+                            <!-- /.card -->
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+
+            <div aria-hidden="true" class="modal fade" id="modal-xl">
+                <div class="modal-dialog modal-xl" style="height: 85%;">
+                    <div class="modal-content" style="height: 100%;">
+                        <div class="modal-header">
+                            <h4 class="modal-title">知识图谱浏览器</h4>
+                            <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body" style="height: 100%;">
+                            <div class="ppt-div-graph" id="popoto-graph">
+                                <!-- Graph is generated here -->
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button class="btn btn-default" data-dismiss="modal" type="button">关闭</button>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+            <div aria-modal="true" class="modal fade show" id="modal-overlay" style="display: none;">
+                <div class="modal-dialog">
+                    <div class="modal-content" id="div-to-overlay">
+                        <div class="modal-header">
+                            <h4 class="modal-title">更新图数据库</h4>
+                            <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>更新图数据库将花费十秒左右的时间，请耐心等待，更新完成后页面将会自动刷新。</p>
+                            <p>确定更新图数据库？</p>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button class="btn btn-default" data-dismiss="modal" type="button">取消</button>
+                            <button class="btn btn-primary" id="btn-update" type="button">确定更新</button>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+        </div>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    <div th:replace="/common/footer::footer"></div>
+</div>
+<!-- ./wrapper -->
+
+<!-- REQUIRED SCRIPTS -->
+
+<!-- jQuery -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/jquery/jquery.min.js}"></script>
+<!-- Bootstrap 4 -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<!-- AdminLTE App -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/dist/js/adminlte.min.js}"></script>
+<!-- Notification Count Update -->
+<script th:src="@{/js/notification.js}"></script>
+<!-- popoto -->
+<script th:src="@{/js/node_modules/d3/dist/d3.min.js}"></script>
+<script th:src="@{/js/node_modules/popoto/dist/popoto.min.js}"></script>
+
+<script>
+    (function () {
+        $("#btn-update").click(function () {
+            $("#div-to-overlay").prepend('<div class="overlay d-flex justify-content-center align-items-center"><i class="fas fa-2x fa-sync fa-spin text-white"></i></div>');
+            $.ajax({
+                url: "/graph/sync",
+                async: true,
+                type: "GET",
+                success: function (req) {
+                    console.log("更新完成");
+                    console.log(req);
+                    location.reload();
+                }
+            });
+        });
+    })();
+</script>
+
+<!-- popoto user's script -->
+<script>
+    popoto.rest.CYPHER_URL = "[[${server}]]/db/[[${database}]]/tx/commit";
+    popoto.rest.AUTHORIZATION = "[[${authorization}]]";
+    popoto.provider.node.Provider = {
+        "Team": {
+            "returnAttributes": ["teamName", "teamIdentifier"]
+        },
+        "Subject": {
+            "returnAttributes": ["subjectName", "subjectIdentifier"]
+        },
+        "User": {
+            "returnAttributes": ["userName", "userEmail"]
+        }
+    }
+    popoto.query.USE_RELATION_DIRECTION = false;
+    popoto.start("Team");
+</script>
+
+
+</body>
+
+</html>

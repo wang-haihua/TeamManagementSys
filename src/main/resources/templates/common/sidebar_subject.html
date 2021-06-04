@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>sidebar for subject</title>
+</head>
+<body>
+<aside class="main-sidebar sidebar-dark-primary elevation-4" th:fragment="sidebar (select, subject)">
+    <!-- Brand Logo -->
+    <a class="brand-link" th:href="@{/workbench}">
+        <img alt="TeamPlus Logo" class="brand-image img-circle" src="#" style="opacity: .8"
+             th:src="@{/img/logo_without_name_128x128.png}">
+        <span class="brand-text font-weight-light">Team Plus</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                <img alt="User Image" class="img-circle" src="#"
+                     th:src="@{${#objects.nullSafe(subject.getSubjectAvatar(), '/img/user1.png')}}">
+            </div>
+            <div class="info">
+                <a class="d-block" th:href="@{'/s/' + ${subject.getSubjectIdentification()}}"
+                   th:text="${subject.getSubjectName()}">干饭的科学</a>
+            </div>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-accordion="false" data-widget="treeview"
+                role="menu">
+                <!-- Add icons to the links using the .nav-icon class
+                   with font-awesome or any other icon font library -->
+                <li class="nav-item">
+                    <a th:class="${select=='status'?'nav-link active':'nav-link'}"
+                       th:href="@{'/s/' + ${subject.getSubjectIdentification()} + '/status'}">
+                        <i class="nav-icon fas fa-chalkboard"></i>
+                        <p>
+                            课题概览
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a th:class="${select=='task'?'nav-link active':'nav-link'}"
+                       th:href="@{'/s/' + ${subject.getSubjectIdentification()} + '/tasks'}">
+                        <i class="nav-icon far fa-check-square"></i>
+                        <p>
+                            任务管理
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a th:class="${select=='discussion'?'nav-link active':'nav-link'}"
+                       th:href="@{'/s/' + ${subject.getSubjectIdentification()} + '/discussion'}">
+                        <i class="nav-icon far fa-check-square"></i>
+                        <p>
+                            课题讨论
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a th:class="${select=='file'?'nav-link active':'nav-link'}"
+                       th:href="@{'/s/' + ${subject.getSubjectIdentification()} + '/files'}">
+                        <i class="nav-icon far fa-folder-open"></i>
+                        <p>
+                            文档管理
+                        </p>
+                    </a>
+                </li>
+                <li th:class="${#strings.contains(select, 'setting')?'nav-item has-treeview menu-open':'nav-item has-treeview'}">
+                    <a class="nav-link" href="#">
+                        <i class="nav-icon fas fa-bars"></i>
+                        <p>
+                            课题管理
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item ml-3">
+                            <a th:class="${select=='setting-subject-info'?'nav-link active':'nav-link'}"
+                               th:href="@{'/s/' + ${subject.getSubjectIdentification()} + '/setting'}">
+                                <i class="fas fa-cogs nav-icon"></i>
+                                <p>课题信息维护</p>
+                            </a>
+                        </li>
+                        <li class="nav-item ml-3">
+                            <a th:class="${select=='setting-member'?'nav-link active':'nav-link'}"
+                               th:href="@{'/s/' + ${subject.getSubjectIdentification()} + '/members'}">
+                                <i class="fas fa-users-cog nav-icon"></i>
+                                <p>课题成员管理</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+</aside>
+</body>
+</html>

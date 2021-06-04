@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.dagongren8.teamplus.mapper.LoginLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.dagongren8.teamplus.entity.LoginLog">
+        <id column="log_id" property="logId" />
+        <result column="log_createtime" property="logCreatetime" />
+        <result column="login_ip" property="loginIp" />
+        <result column="login_opsys" property="loginOpsys" />
+        <result column="login_browser" property="loginBrowser" />
+        <association property="loginUser" javaType="cn.dagongren8.teamplus.entity.User">
+            <id column="user_id" property="userId"/>
+            <result column="user_name" property="userName"/>
+            <result column="user_password" property="userPassword"/>
+            <result column="user_avatar" property="userAvatar"/>
+            <result column="user_email" property="userEmail"/>
+            <result column="team_authority" property="teamAuthority"/>
+            <result column="user_createtime" property="userCreatetime"/>
+        </association>
+    </resultMap>
+
+    <select id="getAllUserLoginLog" resultMap="BaseResultMap">
+        SELECT *
+        FROM login_log
+                 natural join `user`
+    </select>
+    <select id="getLoginLogById" resultMap="BaseResultMap">
+        SELECT *
+        FROM login_log
+                 LEFT JOIN `user` ON login_log.login_user = user.user_id
+        WHERE log_id = ${logId}
+    </select>
+    <insert id="insertLoginLog" useGeneratedKeys="true" keyProperty="logId">
+        INSERT INTO login_log(login_user, login_ip, login_opsys, login_browser)
+        VALUES (#{loginUser.userId}, #{loginIp}, #{loginOpsys}, #{loginBrowser})
+    </insert>
+    <update id="updateLoginLogById" keyProperty="logId">
+        UPDATE login_log
+        SET login_user    = #{loginUser.userId},
+            login_ip      = #{loginIp},
+            login_opsys   = #{loginOpsys},
+            login_browser = #{loginBrowser}
+        WHERE log_id = #{logId}
+    </update>
+    <delete id="deleteLoginLogById">
+        DELETE
+        FROM login_log
+        WHERE log_id = ${logId}
+    </delete>
+
+</mapper>

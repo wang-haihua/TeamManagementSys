@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+
+    <title>工作台</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/plugins/fontawesome-free/css/all.min.css}">
+    <!-- Theme style -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/dist/css/adminlte.min.css}">
+    <!-- Select2 -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/plugins/select2/css/select2.min.css}">
+    <link rel="stylesheet"
+          th:href="@{/webjars/AdminLTE/3.0.0/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
+</head>
+
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <div th:replace="/common/nav::nav"></div>
+
+    <!-- Main Sidebar Container -->
+    <div th:replace="/common/sidebar_subject::sidebar ('task', ${subject})"></div>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">创建任务</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">课题页面</a></li>
+                            <li class="breadcrumb-item active">任务管理</a></li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <form enctype="multipart/form-data" method="post" th:action="@{'/s/' + ${subject.getSubjectIdentification()} + '/tasks/add'}">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title">任务信息</h3>
+
+                                <div class="card-tools">
+                                    <button class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip"
+                                            title="Collapse" type="button">
+                                        <i class="fas fa-minus"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="inputTitle">标题</label>
+                                    <input class="form-control" id="inputTitle" name="taskTitle"
+                                           th:value="${#objects.nullSafe(inputTaskTitle, '')}"
+                                           type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputDescription">任务描述</label>
+                                    <textarea class="form-control" id="inputDescription" name="taskContent" rows="8"
+                                              th:text="${#objects.nullSafe(inputTaskContent, '')}"></textarea>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                        <a class="btn btn-secondary" th:href="@{'/s/' + ${subject.getSubjectIdentification()} + '/tasks'}">取消</a>
+                        <input class="btn btn-success float-right" type="submit" value="创建新任务">
+                    </div>
+                    <!-- /.col-md-8 -->
+                    <div class="col-lg-4">
+                        <div class="card card-primary">
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label>处理人</label>
+                                    <select class="form-control select2" name="processorId" style="width: 100%;">
+                                        <option value="0">请指定任务处理人</option>
+                                        <option th:each="subjectUser:${subjectUsers}" th:text="${subjectUser.getUserName()}" th:value="${subjectUser.getUserId()}">刘思齐</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>优先级</label>
+                                    <select class="form-control custom-select" name="taskRank" style="width: 100%;">
+                                        <option th:selected="${inputTaskRank == 3 ? true : false}" value="3">低</option>
+                                        <option th:selected="${inputTaskRank == 2 ? true : false}" value="2">中</option>
+                                        <option th:selected="${inputTaskRank == 1 ? true : false}" value="1">高</option>
+                                        <option th:selected="${inputTaskRank == 0 ? true : false}" value="0">紧急</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>开始日期</label>
+
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                        </div>
+                                        <input class="form-control" data-inputmask-alias="datetime"
+                                               data-inputmask-inputformat="yyyy/mm/dd" name="taskStarttime"
+                                               th:value="${#objects.nullSafe(inputTaskStarttime, '')}"
+                                               type="date">
+                                    </div>
+                                    <!-- /.input group -->
+                                </div>
+                                <div class="form-group">
+                                    <label>截止日期</label>
+
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                        </div>
+                                        <input class="form-control" data-inputmask-alias="datetime"
+                                               data-inputmask-inputformat="yyyy/mm/dd" name="taskDeadline"
+                                               th:value="${#objects.nullSafe(inputTaskDeadline, '')}"
+                                               type="date">
+                                    </div>
+                                    <!-- /.input group -->
+                                </div>
+                                <div class="form-group">
+                                    <label>预计工时</label>
+                                    <input class="form-control" name="taskDuration" placeholder="小时"
+                                           th:value="${#objects.nullSafe(inputTaskDuration, '')}"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.col-md-4 -->
+                    </div>
+                    <!-- /.row -->
+                </div><!-- /.container-fluid -->
+                </form>
+            </div>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+    </div>
+
+    <!-- Main Footer -->
+    <div th:replace="/common/footer::footer"></div>
+</div>
+<!-- ./wrapper -->
+
+<!-- REQUIRED SCRIPTS -->
+
+<!-- jQuery -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/jquery/jquery.min.js}"></script>
+<!-- Bootstrap 4 -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<!-- AdminLTE App -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/dist/js/adminlte.min.js}"></script>
+<!-- Select2 -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/select2/js/select2.full.min.js}"></script>
+<!-- Notification Count Update -->
+<script th:src="@{/js/notification.js}"></script>
+<script>
+    $(function () {
+        //Initialize Select2 Elements
+        $('.select2').select2({
+            theme: 'bootstrap4'
+        });
+
+        $('.select2ns').select2({
+            theme: 'bootstrap4',
+            minimumResultsForSearch: Infinity
+        });
+    });
+</script>
+
+</body>
+
+</html>

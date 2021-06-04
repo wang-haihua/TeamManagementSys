@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+
+    <title>工作台</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/plugins/fontawesome-free/css/all.min.css}">
+    <!-- Theme style -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/dist/css/adminlte.min.css}">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/plugins/icheck-bootstrap/icheck-bootstrap.min.css}">
+</head>
+
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <div th:replace="/common/nav::nav"></div>
+
+    <!-- Main Sidebar Container -->
+    <div th:replace="/common/sidebar_main::sidebar ('notification', ${team})"></div>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">通知中心</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">个人主页</a></li>
+                            <li class="breadcrumb-item active">通知中心</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="row">
+                <div class="col-md-3">
+                    <a class="btn btn-primary btn-block mb-3" th:href="@{/notification/read/all}">标记所有为已读</a>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">分类</h3>
+
+                            <div class="card-tools">
+                                <button class="btn btn-tool" data-card-widget="collapse" type="button"><i
+                                        class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <ul class="nav nav-pills flex-column">
+                                <li class="nav-item">
+                                    <a class="nav-link" th:href="@{/notification/all}">
+                                        <i class="fas fa-inbox"></i> &nbsp;全部通知
+                                        <span class="badge bg-primary float-right" th:if="${cnt[0] > 0}"
+                                              th:text="${cnt[0]}">72</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" th:href="@{/notification/system}">
+                                        <i class="far fa-envelope"></i> &nbsp;系统通知
+                                        <span class="badge bg-primary float-right" th:if="${cnt[1] > 0}"
+                                              th:text="${cnt[1]}">15</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" th:href="@{/notification/team}">
+                                        <i class="fas fa-users"></i> 课题组通知
+                                        <span class="badge bg-primary float-right" th:if="${cnt[2] > 0}"
+                                              th:text="${cnt[2]}">3</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" th:href="@{/notification/subject}">
+                                        <i class="fas fa-chalkboard"></i> 课题通知
+                                        <span class="badge bg-primary float-right" th:if="${cnt[3] > 0}"
+                                              th:text="${cnt[3]}">5</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">课题</h3>
+
+                            <div class="card-tools">
+                                <button class="btn btn-tool" data-card-widget="collapse" type="button"><i
+                                        class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0" style="display: block;">
+                            <ul class="nav nav-pills flex-column">
+                                <li class="nav-item" th:each="s : ${subjects}">
+                                    <a class="nav-link"
+                                       th:href="@{'/notification/subject/' + ${s.getSubjectIdentification()}}">
+                                        <i class="far fa-circle text-primary"></i>
+                                        <span th:text="${s.getSubjectName()}"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+                <!-- /.col -->
+                <div class="col-md-9">
+                    <div class="card card-primary card-outline">
+
+                        <div class="card-header">
+                            <h3 class="card-title" th:text="${title}">通知</h3>
+
+                            <div class="card-tools">
+                                <form id="form-search" method="get" th:action="@{/notification/search}">
+                                    <div class="input-group input-group-sm">
+                                        <input class="form-control" name="q" placeholder="搜索通知" type="text">
+                                        <div class="input-group-append">
+                                            <div class="btn btn-primary" onclick="$('#form-search').submit()">
+                                                <i class="fas fa-search"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+
+                            </div>
+                            <!-- /.card-tools -->
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body p-0">
+                            <form id="form-read" method="post" th:action="@{/notification/read}">
+                                <input name="type" th:value="${type}" type="hidden">
+                                <input name="pageIndex" th:value="${pageIndex}" type="hidden">
+                                <input name="subjectIdentifier" th:value="${subjectIdentifier}" type="hidden">
+                                <input id="input-op" name="op" type="hidden" value="read">
+                                <input name="query" th:value="${query}" type="hidden">
+
+                                <div class="mailbox-controls">
+                                    <!-- Check all button -->
+                                    <button class="btn btn-default btn-sm checkbox-toggle" type="button"><i
+                                            class="far fa-square"></i>
+                                    </button>
+                                    <div class="btn-group">
+                                        <button class="btn btn-default btn-sm btn-read" type="button"><i
+                                                class="fas fa-check"></i></button>
+                                        <button class="btn btn-default btn-sm btn-delete" type="button"><i
+                                                class="far fa-trash-alt"></i></button>
+                                    </div>
+                                    <!-- /.btn-group -->
+                                    <button class="btn btn-default btn-sm" onclick="location.reload();" type="button"><i
+                                            class="fas fa-sync-alt"></i>
+                                    </button>
+                                    <div class="float-right">
+                                        <span th:text="${notifications.getStartRow()}">1</span>-<span
+                                            th:text="${notifications.getEndRow()}">6</span>/<span
+                                            th:text="${notifications.getTotal()}">200</span>
+                                        <div class="btn-group">
+                                            <a class="btn btn-default btn-sm"
+                                               th:href="@{${url} + '?pageIndex=' + ${notifications.getPrePage()} + ${#objects.nullSafe(query, '')}}"
+                                               type="button"><i
+                                                    class="fas fa-chevron-left"></i></a>
+                                            <a class="btn btn-default btn-sm"
+                                               th:href="@{${url} + '?pageIndex=' + ${notifications.getNextPage()} + ${#objects.nullSafe(query, '')}}"
+                                               type="button"><i
+                                                    class="fas fa-chevron-right"></i></a>
+                                        </div>
+                                        <!-- /.btn-group -->
+                                    </div>
+                                    <!-- /.float-right -->
+                                </div>
+                                <div class="table-responsive mailbox-messages">
+                                    <p class="text-center mt-3 mb-3 text-secondary"
+                                       th:if="${notifications.list.size() == 0}">
+                                        暂无通知</p>
+                                    <table class="table table-hover table-striped">
+                                        <tbody>
+                                        <tr th:each="n, stat : ${notifications.list}">
+                                            <td style="width: 1px;">
+                                                <div class="icheck-primary">
+                                                    <input name="notificationIds" th:id="'check' + ${stat.index + 1}"
+                                                           th:value="${n.getNotificationId()}" type="checkbox">
+                                                    <label th:for="'check' + ${stat.index + 1}"></label>
+                                                </div>
+                                            </td>
+                                            <td class="mailbox-star" style="width: 30px;"><i
+                                                    class="fas fa-circle text-primary"
+                                                    th:if="${!n.isNotificationRead()}"></i></td>
+                                            <td class="mailbox-subject" data-toggle="modal"
+                                                th:data-target="'#notificationInfo' + ${stat.index + 1}">
+                                                <b th:if="${n.getNotificationType() == 0}">系统通知</b>
+                                                <b th:if="${n.getNotificationType() == 1}">课题组通知</b>
+                                                <b th:if="${n.getNotificationType() == 2}">课题[<span
+                                                        th:text="${n.getSubject().getSubjectName()}"></span>]</b>
+                                                -
+                                                <span th:text="${n.getNotificationContent().length() > 40 ? n.getNotificationContent().substring(0, 40) + '...' : n.getNotificationContent()}"></span>
+                                                <div aria-hidden="true" aria-labelledby="notificationModalLabel"
+                                                     class="modal fade" role="dialog" tabindex="-1"
+                                                     th:id="'notificationInfo' + ${stat.index + 1}">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h4 class="modal-title" id="notificationModalLabel">
+                                                                    通知详情</h4>
+                                                                <button aria-hidden="true" class="close"
+                                                                        data-dismiss="modal" type="button">&times;
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body"
+                                                                 th:text="${n.getNotificationContent()}">
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button class="btn btn-primary text-white"
+                                                                        data-dismiss="modal">
+                                                                    确认
+                                                                </button>
+                                                            </div>
+                                                        </div><!-- /.modal-content -->
+                                                    </div><!-- /.modal -->
+                                                </div>
+                                            </td>
+                                            <td class="mailbox-date" style="width: 95px;"
+                                                th:text="${#dates.format(n.getNotificationCreatetime(), 'MM-dd HH:mm')}">
+                                                02-06 14:34
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <!-- /.table -->
+                                </div>
+                                <!-- /.mail-box-messages -->
+                            </form>
+                        </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer p-0">
+                                <div class="mailbox-controls">
+                                    <!-- Check all button -->
+                                    <button class="btn btn-default btn-sm checkbox-toggle" type="button"><i
+                                            class="far fa-square"></i>
+                                    </button>
+
+                                    <div class="btn-group">
+                                        <button class="btn btn-default btn-sm btn-read" type="button"><i
+                                                class="fas fa-check"></i></button>
+                                        <button class="btn btn-default btn-sm btn-delete" type="button"><i
+                                                class="far fa-trash-alt"></i></button>
+                                    </div>
+                                    <button class="btn btn-default btn-sm" onclick="location.reload();" type="button"><i
+                                            class="fas fa-sync-alt"></i>
+                                    </button>
+                                    <!-- /.btn-group -->
+                                    <div class="float-right">
+                                        <span th:text="${notifications.getStartRow()}">1</span>-<span
+                                            th:text="${notifications.getEndRow()}">6</span>/<span
+                                            th:text="${notifications.getTotal()}">200</span>
+                                        <div class="btn-group">
+                                            <a class="btn btn-default btn-sm"
+                                               th:href="@{${url} + '?pageIndex=' + ${notifications.getPrePage()} + ${#objects.nullSafe(query, '')}}"
+                                               type="button"><i
+                                                    class="fas fa-chevron-left"></i></a>
+                                            <a class="btn btn-default btn-sm"
+                                               th:href="@{${url} + '?pageIndex=' + ${notifications.getNextPage()} + ${#objects.nullSafe(query, '')}}"
+                                               type="button"><i
+                                                    class="fas fa-chevron-right"></i></a>
+                                        </div>
+                                        <!-- /.btn-group -->
+                                    </div>
+                                    <!-- /.float-right -->
+                                </div>
+                            </div>
+                    </div>
+                    <!-- /.card -->
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.row -->
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    <div th:replace="/common/footer::footer"></div>
+</div>
+<!-- ./wrapper -->
+
+<!-- REQUIRED SCRIPTS -->
+
+<!-- jQuery -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/jquery/jquery.min.js}"></script>
+<!-- Bootstrap 4 -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<!-- AdminLTE App -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/dist/js/adminlte.min.js}"></script>
+<!-- Notification Count Update -->
+<script th:src="@{/js/notification.js}"></script>
+<script>
+    $(function () {
+        //Enable check and uncheck all functionality
+        $('.checkbox-toggle').click(function () {
+            var clicks = $(this).data('clicks')
+            if (clicks) {
+                //Uncheck all checkboxes
+                $('.mailbox-messages input[type=\'checkbox\']').prop('checked', false)
+                $('.checkbox-toggle .far.fa-check-square').removeClass('fa-check-square').addClass('fa-square')
+            } else {
+                //Check all checkboxes
+                $('.mailbox-messages input[type=\'checkbox\']').prop('checked', true)
+                $('.checkbox-toggle .far.fa-square').removeClass('fa-square').addClass('fa-check-square')
+            }
+            $(this).data('clicks', !clicks)
+        })
+
+        //Handle starring for glyphicon and font awesome
+        $('.mailbox-star').click(function (e) {
+            e.preventDefault()
+            //detect type
+            var $this = $(this).find('a > i')
+            var glyph = $this.hasClass('glyphicon')
+            var fa = $this.hasClass('fa')
+
+            //Switch states
+            if (glyph) {
+                $this.toggleClass('glyphicon-star')
+                $this.toggleClass('glyphicon-star-empty')
+            }
+
+            if (fa) {
+                $this.toggleClass('fa-star')
+                $this.toggleClass('fa-star-o')
+            }
+        })
+
+        $(".btn-read").click(function () {
+            $("#input-op").attr("value", "read");
+            $("#form-read").submit();
+        });
+
+        $(".btn-delete").click(function () {
+            $("#input-op").attr("value", "delete");
+            $("#form-read").submit();
+        });
+    })
+</script>
+</body>
+
+</html>

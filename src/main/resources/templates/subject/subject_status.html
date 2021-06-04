@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+
+    <title>课题概览</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/plugins/fontawesome-free/css/all.min.css}">
+    <!-- Theme style -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/dist/css/adminlte.min.css}">
+</head>
+
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <div th:replace="/common/nav::nav"></div>
+
+    <!-- Main Sidebar Container -->
+    <div th:replace="/common/sidebar_subject::sidebar ('status', ${subject})"></div>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">课题概览</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">课题页面</a></li>
+                            <li class="breadcrumb-item active">课题概览</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-3">
+
+                        <!-- Profile Image -->
+                        <div class="card card-primary card-outline">
+                            <div class="card-body box-profile">
+                                <div class="text-center">
+                                    <img alt="User profile picture"
+                                         class="profile-user-img img-fluid img-circle"
+                                         id="imgSubjectAvatar"
+                                         th:src="@{${#objects.nullSafe(subject.getSubjectAvatar(),'/img/user1.png')}}">
+                                </div>
+
+                                <h3 class="profile-username text-center" th:text="${subject.getSubjectName()}">课题名称</h3>
+
+                                <p class="text-muted text-center" th:text="${subject.getSubjectIdentification()}">课题标识</p>
+
+                                <ul class="list-group list-group-unbordered mb-3">
+                                    <li class="list-group-item">
+                                        <b>创建者</b> <a class="float-right"
+                                                      th:text="${creator == null ? '(null)' : creator.getUserName()}">雷子</a>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <b>管理员</b> <a class="float-right" th:text="${totalManagers}">2</a>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <b>课题成员</b> <a class="float-right" th:text="${totalMembers}">13,287</a>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <b>课题状态</b>
+                                        <a class="float-right">
+                                            <span class="badge badge-info"
+                                                  th:if="${subject.getSubjectStatus() == 0}">未启动</span>
+                                            <span class="badge badge-warning"
+                                                  th:if="${subject.getSubjectStatus() == 1}">进行中</span>
+                                            <span class="badge badge-success"
+                                                  th:if="${subject.getSubjectStatus() == 2}">已完成</span>
+                                            <span class="badge badge-secondary"
+                                                  th:if="${subject.getSubjectStatus() == 3}">已废弃</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+
+                        <!-- About Me Box -->
+                        <div class="card card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title">课题信息</h3>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                                <strong><i class="fas fa-book mr-1"></i> 课题描述</strong>
+
+                                <p class="text-muted" th:text="${subject.getSubjectDescription()}">
+                                    完成课题组管理系统
+                                </p>
+
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                    <div class="col-9">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">公告</h3>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                                <p class="text-gray text-center mt-3" th:if="${announcements.size() == 0}">暂无公告</p>
+                                <div class="post" th:each="a : ${announcements}">
+                                    <div class="user-block">
+                                        <img alt="User profile picture"
+                                             class="profile-user-img img-fluid img-circle"
+                                             th:src="@{${#objects.nullSafe(a.getUser().getUserAvatar(), '/img/user1.png')}}">
+                                        <span class="username">
+                                          <a href="#" th:text="${a.getUser().getUserName()}">玩海华</a>
+                                          <a class="float-right btn-tool" href="#"><i class="fas fa-times"></i></a>
+                                        </span>
+                                        <span class="description">全体通告 - <span
+                                                th:text="${#dates.format(a.getAnnouncementCreatetime(), 'yyyy年MM月dd日 HH:mm:ss')}"></span></span>
+                                    </div>
+                                    <!-- /.user-block -->
+                                    <p th:text="${a.getAnnouncementContent()}">公告内容</p>
+                                </div>
+
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer clearfix">
+                                <form method="post"
+                                      th:action="@{'/s/' + ${subject.getSubjectIdentification()} + '/announcement'}">
+                                    <div class="row">
+                                        <div class="col-11">
+                                            <input class="form-control form-control-sm" name="content"
+                                                   placeholder="发布新公告"
+                                                   type="text">
+                                        </div>
+                                        <div class="col-1">
+                                            <input class="btn btn-sm btn-primary ml-1 mr-1" type="submit" value="发布">
+                                        </div>
+
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    <div th:replace="/common/footer::footer"></div>
+</div>
+<!-- ./wrapper -->
+
+<!-- REQUIRED SCRIPTS -->
+
+<!-- jQuery -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/jquery/jquery.min.js}"></script>
+<!-- Bootstrap 4 -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<!-- AdminLTE App -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/dist/js/adminlte.min.js}"></script>
+<!-- Notification Count Update -->
+<script th:src="@{/js/notification.js}"></script>
+</body>
+
+</html>

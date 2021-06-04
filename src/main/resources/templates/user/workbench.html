@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+
+    <title>工作台</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/plugins/fontawesome-free/css/all.min.css}">
+    <!-- Theme style -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/dist/css/adminlte.min.css}">
+</head>
+
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <div th:replace="/common/nav::nav"></div>
+
+    <!-- Main Sidebar Container -->
+    <div th:replace="/common/sidebar_main::sidebar ('workbench', ${team})"></div>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">工作台</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">个人主页</a></li>
+                            <li class="breadcrumb-item active">工作台</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header ui-sortable-handle" style="cursor: move;">
+                                <h3 class="card-title">
+                                    <i class="ion ion-clipboard mr-1"></i>
+                                    待办事项
+                                </h3>
+
+                                <div class="card-tools">
+                                    <ul class="pagination pagination-sm float-right">
+                                        <li class="page-item"><a class="page-link"
+                                                                 th:href="@{'/workbench?pageIndex='+${tasks.pageNum - 1}}">«</a>
+                                        </li>
+                                        <th:block th:each="nav : ${tasks.navigatepageNums}">
+                                            <li class="page-item" th:classappend="${tasks.pageNum==nav?'active':''}">
+                                                <a class="page-link"
+                                                   th:href="@{'workbench?pageIndex='+${nav}}"
+                                                   th:text="${nav}">1</a>
+                                            </li>
+                                        </th:block>
+                                        <li class="page-item"><a class="page-link"
+                                                                 th:href="@{'/workbench?pageIndex='+${tasks.pageNum + 1}}">»</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body p-0">
+                                <table class="table projects">
+                                    <thead>
+                                    <tr>
+                                        <th style="width: 30px">#</th>
+                                        <th>任务名称</th>
+                                        <th>所属课题</th>
+                                        <th>优先级</th>
+                                        <th>创建时间</th>
+                                        <th>截止日期</th>
+                                        <th>状态更改</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="task, stat : ${tasks.list}">
+                                        <td th:text="${stat.index + 1} + '.'">1</td>
+                                        <td>
+                                            <a data-toggle="modal" href="#"
+                                               th:data-target="'#taskInfo' + ${stat.index + 1}"
+                                               th:text="${task.getTaskTitle()}">把冰箱打开</a>
+                                            <div aria-hidden="true" aria-labelledby="taskModalLabel"
+                                                 class="modal fade" role="dialog" tabindex="-1"
+                                                 th:id="'taskInfo' + ${stat.index + 1}">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h4 class="modal-title" id="taskModalLabel">任务详情</h4>
+                                                            <button aria-hidden="true" class="close"
+                                                                    data-dismiss="modal" type="button">&times;
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body"
+                                                             th:text="${#strings.isEmpty(task.getTaskContent()) ? '无任务描述' : task.getTaskContent()}">
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-primary text-white"
+                                                                    data-dismiss="modal">
+                                                                确认
+                                                            </button>
+                                                        </div>
+                                                    </div><!-- /.modal-content -->
+                                                </div><!-- /.modal -->
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <a th:href="'/s/' + ${task.getSubject().getSubjectIdentification()}"
+                                               th:text="${task.getSubject().getSubjectName()}"></a>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-success"
+                                                  th:if="${task.getTaskRank() == 3}"> 低 </span>
+                                            <span class="badge badge-primary"
+                                                  th:if="${task.getTaskRank() == 2}"> 中 </span>
+                                            <span class="badge badge-warning"
+                                                  th:if="${task.getTaskRank() == 1}"> 高 </span>
+                                            <span class="badge badge-danger"
+                                                  th:if="${task.getTaskRank() == 0}">紧急</span>
+                                        </td>
+
+                                        <td th:text="${#dates.format(task.getTaskCreatetime(), 'yyyy年MM月dd日')}"></td>
+                                        <td th:text="${#dates.format(task.getTaskDeadline(), 'yyyy年MM月dd日')}"></td>
+                                        <td>
+                                            <select class="custom-select selectStatus"
+                                                    th:attr="taskId=${task.getTaskId()}">
+                                                <option th:selected="${task.getTaskStatus() == 0 ? 'true' : 'false'}"
+                                                        value="0">未开始
+                                                </option>
+                                                <option th:selected="${task.getTaskStatus() == 1 ? 'true' : 'false'}"
+                                                        value="1">进行中
+                                                </option>
+                                                <option th:selected="${task.getTaskStatus() == 2 ? 'true' : 'false'}"
+                                                        value="2">已完成
+                                                </option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <p class="text-gray text-center mt-5 mb-5" th:if="${tasks.list.size() == 0}">
+                                    暂无任务，可以放松一下啦～</p>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    <div th:replace="/common/footer::footer"></div>
+</div>
+<!-- ./wrapper -->
+
+<!-- 任务状态更新 -->
+<form hidden id="formUpdateStatus" method="post" th:action="@{/workbench/status}">
+    <input id="inputTaskId" name="taskId" type="text">
+    <input id="inputTaskStatus" name="status" type="text">
+</form>
+
+
+<!-- REQUIRED SCRIPTS -->
+
+<!-- jQuery -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/jquery/jquery.min.js}"></script>
+<!-- Bootstrap 4 -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<!-- AdminLTE App -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/dist/js/adminlte.min.js}"></script>
+<!-- Notification Count Update -->
+<script th:src="@{/js/notification.js}"></script>
+
+<script>
+    $(function () {
+        $('.selectStatus').change(function (e) {
+            $('#inputTaskId').val(e.target.getAttribute('taskId'));
+            $('#inputTaskStatus').val(e.target.value);
+            $('#formUpdateStatus').submit();
+        });
+    });
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+
+    <title>课题组信息维护</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/plugins/fontawesome-free/css/all.min.css}">
+    <!-- Theme style -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/dist/css/adminlte.min.css}">
+    <!-- Select2 -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/plugins/select2/css/select2.min.css}">
+    <link rel="stylesheet"
+          th:href="@{/webjars/AdminLTE/3.0.0/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css}">
+</head>
+
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <div th:replace="/common/nav::nav"></div>
+
+    <!-- Main Sidebar Container -->
+    <div th:replace="/common/sidebar_subject::sidebar ('setting-subject-info', ${subject})"></div>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">课题信息维护</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">课题页面</a></li>
+                            <li class="breadcrumb-item active">课题信息维护</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-3">
+
+                        <!-- Profile Image -->
+                        <div class="card card-primary card-outline">
+                            <div class="card-body box-profile">
+                                <div class="text-center">
+                                    <img alt="User profile picture" class="profile-user-img img-fluid img-circle"
+                                         id="imgSubjectAvatar"
+                                         th:src="@{${#objects.nullSafe(subject.getSubjectAvatar(),'/img/user1.png')}}">
+                                </div>
+
+                                <h3 class="profile-username text-center" th:text="${subject.getSubjectName()}">课题名称</h3>
+                                <hr>
+                                <strong>课题标识</strong>
+
+                                <p class="text-muted" th:text="${subject.getSubjectIdentification()}">
+                                    https://teamplus/dagongren...
+                                </p>
+
+                                <hr>
+
+                                <strong>课题创建时间</strong>
+
+                                <p class="text-muted"
+                                   th:text="${#dates.format(subject.getSubjectCreatetime(),'yyyy/MM/dd')}">
+                                    2021年1月11日</p>
+
+                                <hr>
+
+                                <strong>课题简介</strong>
+
+                                <p class="text-muted" th:text="${subject.getSubjectDescription()}">
+                                    我是课题描述，我是课题简介，我是课题相关介绍，我是一堆废话。
+                                </p>
+
+                                <hr>
+
+                                <strong>课题状态</strong>
+
+                                <select class="custom-select selectStatus">
+                                    <option th:selected="${subject.getSubjectStatus() == 0 ? 'true' : 'false'}"
+                                            value="0">未开始
+                                    </option>
+                                    <option th:selected="${subject.getSubjectStatus() == 1 ? 'true' : 'false'}"
+                                            value="1">进行中
+                                    </option>
+                                    <option th:selected="${subject.getSubjectStatus() == 2 ? 'true' : 'false'}"
+                                            value="2">已完成
+                                    </option>
+                                </select>
+
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-md-9">
+                        <div class="card">
+                            <div class="card-header p-2">
+                                <ul class="nav nav-pills">
+                                    <li class="nav-item"><a class="nav-link" data-toggle="tab"
+                                                            href="#basic-settings"
+                                                            th:classappend="${#objects.nullSafe(tab, 1) == 1 ? 'active' : ''}">基本设置</a>
+                                    </li>
+                                    <li class="nav-item" th:if="${subjectAuthority.getSubjectAuthorityType() != 0}"><a class="nav-link" data-toggle="tab"
+                                                            href="#advanced-settings"
+                                                            th:classappend="${#objects.nullSafe(tab, 1) == 2 ? 'active' : ''}">高级设置</a>
+                                    </li>
+                                </ul>
+                            </div><!-- /.card-header -->
+                            <div class="card-body">
+                                <div class="tab-content">
+                                    <div class="tab-pane" id="basic-settings"
+                                         th:classappend="${#objects.nullSafe(tab, 1) == 1 ? 'active' : ''}">
+                                        <form class="form-horizontal" method="post"
+                                              th:action="@{'/s/' + ${subject.getSubjectIdentification()} + '/setting'}">
+                                            <input name="subjectId" th:value="${subject.getSubjectId()}" type="hidden">
+                                            <div class="form-group row">
+                                                <label class="col-sm-10 col-form-label" for="subjectName">课题名称</label>
+                                                <div class="col-sm-12">
+                                                    <input class="form-control" id="subjectName" name="subjectName"
+                                                           placeholder="我是课题名称"
+                                                           th:value="${inputSubjectName != null ? inputSubjectName : subject.getSubjectName()}"
+                                                           type="text">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-sm-10 col-form-label"
+                                                       for="teamIdentifier">课题标识</label>
+                                                <div class="col-sm-12">
+                                                    <input class="form-control" id="teamIdentifier"
+                                                           name="subjectIdentifier"
+                                                           th:value="${ inputSubjectIdentifier!= null ? inputSubjectIdentifier : subject.getSubjectIdentification()}"
+                                                           type="text">
+
+                                                </div>
+                                                <p class="text-danger ml-2" th:if="${error_info}"
+                                                   th:text="${error_info}"></p>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-sm-10 col-form-label"
+                                                       for="teamIdentifier">课题描述</label>
+                                                <div class="col-sm-12">
+                                                    <textarea class="form-control" id="subjectDescription"
+                                                           name="subjectDescription" rows="4"
+                                                           th:text="${ inputSubjectDescription!= null ? inputSubjectDescription : subject.getSubjectDescription()}"
+                                                           type="text">
+                                                    </textarea>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row" th:if="${subjectAuthority.getSubjectAuthorityType() != 0}">
+                                                <div class="col-sm-10">
+                                                    <button class="btn btn-danger" style="width: 150px;" type="submit">
+                                                        确认修改
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <!-- /.tab-pane -->
+                                    <div class="tab-pane" id="advanced-settings"
+                                         th:classappend="${#objects.nullSafe(tab, 1) == 2 ? 'active' : ''}">
+                                        <div class="form-group row">
+                                            <label class="col-sm-10 col-form-label" for="transferTeam">转让课题</label>
+                                            <div class="col-sm-12">
+                                                <p id="transferTeam">
+                                                    转让课题后，您将无法再次以该账号登录该课题，您将丢失该账号下所有存储数据。此操作无法撤消，请谨慎。</p>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <button class="btn btn-danger" data-target="#subjectTransfer"
+                                                        data-toggle="modal"
+                                                        style="width: 150px;">
+                                                    转让课题
+                                                </button>
+                                                <div aria-hidden="true" aria-labelledby="transferModalLabel"
+                                                     class="modal fade" id="subjectTransfer" role="dialog"
+                                                     tabindex="-1">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h4 class="modal-title" id="transferModalLabel">
+                                                                    转让课题</h4>
+                                                                <button aria-hidden="true" class="close"
+                                                                        data-dismiss="modal" type="button">&times;
+                                                                </button>
+                                                            </div>
+                                                            <form method="post"
+                                                                  th:action="@{'/s/' + ${subject.getSubjectIdentification()} + '/transfer'}">
+
+                                                                <div class="modal-body">
+                                                                    请选择新的创建者：
+                                                                    <select class="form-control select2"
+                                                                            name="toUserId" style="width: 100%;">
+                                                                        <option th:each="sa:${subjectUsers}"
+                                                                                th:text="${sa.getUser().getUserName()}"
+                                                                                th:value="${sa.getUser().getUserId()}">
+                                                                            刘思齐
+                                                                        </option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <a class="btn btn-primary text-white"
+                                                                       data-dismiss="modal">取消</a>
+                                                                    <button class="btn btn-danger text-white"
+                                                                            type="submit">确认
+                                                                    </button>
+                                                                </div>
+                                                            </form>
+                                                        </div><!-- /.modal-content -->
+                                                    </div><!-- /.modal -->
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <hr>
+                                        <div class="form-group row">
+                                            <label class="col-sm-10 col-form-label" for="disbandTeam">解散课题</label>
+                                            <div class="col-sm-12">
+                                                <p id="disbandTeam">
+                                                    删除课题后，该课题所有数据都将丢失，请确认已经做好数据备份。此操作无法撤消，请谨慎。</p>
+                                                <p class="text-danger" th:if="${delete_error}">
+                                                    删除课题失败，没有权限或密码错误！</p>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <button class="btn btn-danger" data-target="#deleteTask"
+                                                        data-toggle="modal"
+                                                        style="width: 150px;">
+                                                    删除课题
+                                                </button>
+                                                <div aria-hidden="true" aria-labelledby="deleteModalLabel"
+                                                     class="modal fade" id="deleteTask" role="dialog" tabindex="-1">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h4 class="modal-title" id="deleteModalLabel">
+                                                                    删除课题</h4>
+                                                                <button aria-hidden="true" class="close"
+                                                                        data-dismiss="modal" type="button">&times;
+                                                                </button>
+                                                            </div>
+                                                            <form method="post"
+                                                                  th:action="@{'/s/' + ${subject.getSubjectIdentification()} + '/delete'}">
+
+                                                                <div class="modal-body">
+                                                                    此操作为危险操作，请输入登录密码以确定解散课题组：
+                                                                    <input name="password" type="password">
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <a class="btn btn-primary text-white"
+                                                                       data-dismiss="modal">取消</a>
+                                                                    <button class="btn btn-danger text-white"
+                                                                            type="submit">确认
+                                                                    </button>
+                                                                </div>
+                                                            </form>
+                                                        </div><!-- /.modal-content -->
+                                                    </div><!-- /.modal -->
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        </form>
+                                    </div>
+                                </div>
+                                <!-- /.tab-content -->
+                            </div><!-- /.card-body -->
+                        </div>
+                        <!-- /.nav-tabs-custom -->
+                    </div>
+                    <!-- /.col -->
+                </div>
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    <div th:replace="/common/footer::footer"></div>
+</div>
+<!-- ./wrapper -->
+<form enctype="multipart/form-data" id="formSubjectAvatar" method="post"
+      th:action="@{'/s/'+${subject.getSubjectIdentification()}+'/setting/avatar'}">
+    <input accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" hidden id="inputSubjectAvatar"
+           name="subjectAvatar"
+           type="file">
+</form>
+
+<!-- 课题状态更新 -->
+<form hidden id="formUpdateStatus" method="post"
+      th:action="@{'/s/' + ${subject.getSubjectIdentification()} + '/status'}">
+    <input id="inputSubjectStatus" name="status" type="text">
+</form>
+
+<!-- REQUIRED SCRIPTS -->
+
+<!-- jQuery -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/jquery/jquery.min.js}"></script>
+<!-- Bootstrap 4 -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<!-- AdminLTE App -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/dist/js/adminlte.min.js}"></script>
+<!-- Select2 -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/select2/js/select2.full.min.js}"></script>
+<!-- Notification Count Update -->
+<script th:src="@{/js/notification.js}"></script>
+<script>
+    (function () {
+        $("#imgSubjectAvatar").click(function () {
+            $("#inputSubjectAvatar").click();
+        });
+        $("#inputSubjectAvatar").change(function (r) {
+
+            let size = r.target.files[0].size;
+            if (size >= 1024 * 1024) {
+                alert("头像大小不能大于1MB！");
+                target.value = "";
+                return false;
+            }
+
+            $("#formSubjectAvatar").submit();
+        })
+    })();
+
+    $('.select2').select2({
+        theme: 'bootstrap4'
+    });
+
+    $(function () {
+        $('.selectStatus').change(function (e) {
+            $('#inputSubjectStatus').val(e.target.value);
+            $('#formUpdateStatus').submit();
+        });
+    });
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.dagongren8.teamplus.mapper.TeamMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.dagongren8.teamplus.entity.Team">
+        <id column="team_id" property="teamId"/>
+        <result column="team_name" property="teamName"/>
+        <result column="team_identification" property="teamIdentification"/>
+        <result column="team_avatar" property="teamAvatar"/>
+        <result column="team_description" property="teamDescription"/>
+        <result column="team_createtime" property="teamCreatetime"/>
+        <result column="team_invite_token" property="inviteToken"/>
+        <result column="team_invite_token_enabled" property="inviteTokenEnabled"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        team_id, team_name, team_identification, team_avatar, team_description, team_createtime, team_invite_token, team_invite_token_enabled
+    </sql>
+
+    <select id="getAllTeams" resultMap="BaseResultMap">
+        SELECT *
+        FROM team
+    </select>
+    <select id="getTeamById" resultMap="BaseResultMap">
+        SELECT *
+        FROM team
+        WHERE team_id = ${teamId}
+    </select>
+    <select id="getTeamByTeamIdentifier" resultMap="BaseResultMap">
+        SELECT *
+        FROM team
+        WHERE team_identification = '${teamIdentifier}'
+    </select>
+    <insert id="insertTeam" useGeneratedKeys="true" keyProperty="teamId">
+        INSERT INTO team(team_name, team_identification, team_avatar, team_description, team_invite_token,
+                         team_invite_token_enabled)
+        VALUES (#{teamName}, #{teamIdentification}, #{teamAvatar}, #{teamDescription}, #{inviteToken},
+                #{inviteTokenEnabled})
+    </insert>
+    <update id="updateTeamById" keyProperty="teamId">
+        UPDATE team
+        SET team_name=#{teamName},
+            team_identification=#{teamIdentification},
+            team_avatar=#{teamAvatar},
+            team_description=#{teamDescription},
+            team_invite_token=#{inviteToken},
+            team_invite_token_enabled=#{inviteTokenEnabled}
+        WHERE team_id = #{teamId}
+    </update>
+    <delete id="deleteTeamById">
+        DELETE
+        FROM team
+        WHERE team_id = ${teamId}
+    </delete>
+
+</mapper>

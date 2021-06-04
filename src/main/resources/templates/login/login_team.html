@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <title>TeamPlus | 登录课题组</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/plugins/fontawesome-free/css/all.min.css}">
+    <!-- Ionicons -->
+    <link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/plugins/icheck-bootstrap/icheck-bootstrap.min.css}">
+    <!-- Theme style -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/dist/css/adminlte.min.css}">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+</head>
+<body class="hold-transition login-page">
+<div class="login-box" style="width: 450px">
+    <div class="login-logo">
+        <a href="#"><b>Team</b>Plus</a>
+    </div>
+    <!-- /.login-logo -->
+    <div class="card">
+        <div class="card-body login-card-body">
+            <div class="row mb-3 mt-3">
+                <div class="col-5">
+                    <h3>登录课题组</h3>
+                </div>
+                <div class="offset-1 col-6">
+                    <p>课题组未创建？<a th:href="@{/register}">创建课题组</a></p>
+                </div>
+            </div>
+            <form action="#" id="form-team-login" method="get">
+                <div class="input-group mb-3">
+                    <input class="form-control" id="input-team-identifier" placeholder="课题组标识" type="text">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-dice-d6"></span>
+
+                        </div>
+                    </div>
+                </div>
+
+                <p>课题组登录链接：http://localhost:8080/login/<span id="span-team-identifier"></span></p>
+                <p class="login-box-msg text-danger" th:if="${error_info}" th:text="${error_info}"></p>
+                <input class="btn btn-block btn-primary mb-3" type="submit" value="下一步">
+            </form>
+        </div>
+        <!-- /.login-card-body -->
+    </div>
+</div>
+<!-- /.login-box -->
+
+<!-- jQuery -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/jquery/jquery.min.js}"></script>
+<!-- Bootstrap 4 -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<!-- AdminLTE App -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/dist/js/adminlte.min.js}"></script>
+
+<script>
+    (function () {
+        $("#input-team-identifier").keyup(function () {
+            let id = $("#input-team-identifier").val();
+            $("#span-team-identifier").text(id);
+            let url = "/login/" + id;
+            $("#form-team-login").attr("action", url);
+        });
+    })();
+</script>
+
+</body>
+</html>

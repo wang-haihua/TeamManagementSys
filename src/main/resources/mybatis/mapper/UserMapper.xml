@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.dagongren8.teamplus.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.dagongren8.teamplus.entity.User">
+        <id column="user_id" property="userId" />
+        <result column="user_name" property="userName" />
+        <result column="user_password" property="userPassword" />
+        <result column="user_avatar" property="userAvatar" />
+        <result column="user_email" property="userEmail" />
+        <result column="team_authority" property="teamAuthority" />
+        <result column="user_createtime" property="userCreatetime" />
+        <association property="team" javaType="cn.dagongren8.teamplus.entity.Team">
+            <id column="team_id" property="teamId"/>
+            <result column="team_name" property="teamName"/>
+            <result column="team_identification" property="teamIdentification"/>
+            <result column="team_avatar" property="teamAvatar"/>
+            <result column="team_description" property="teamDescription"/>
+            <result column="team_createtime" property="teamCreatetime"/>
+            <result column="team_invite_token" property="inviteToken"/>
+            <result column="team_invite_token_enabled" property="inviteTokenEnabled"/>
+        </association>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        user_id, team_id, user_name, user_password, user_avatar, user_email, team_authority, user_createtime
+    </sql>
+
+    <select id="getAllUsers" resultMap="BaseResultMap">
+        SELECT * FROM  `user`
+    </select>
+
+    <select id="getAllTeamUsers" resultMap="BaseResultMap">
+        SELECT *
+        FROM team
+                 natural join `user`
+        where team_id = ${teamId}
+    </select>
+
+    <select id="getUserById" resultMap="BaseResultMap">
+        SELECT *
+        FROM `user`
+                 natural join team
+        WHERE user_id = ${userId}
+    </select>
+
+    <select id="getUserByEmail" resultMap="BaseResultMap">
+        SELECT *
+        FROM `user`
+        WHERE user_email = ${userEmail}
+    </select>
+
+    <select id="getUserByTeamIdentifierAndEmail" resultMap="BaseResultMap">
+        SELECT *
+        FROM `user`
+                 natural join team
+        WHERE team_identification = '${teamIdentifier}'
+          AND user_email = '${email}'
+    </select>
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO user(team_id, user_name, user_password, user_avatar, user_email, team_authority)
+        VALUES (#{team.teamId}, #{userName}, #{userPassword}, #{userAvatar}, #{userEmail}, #{teamAuthority})
+    </insert>
+    <update id="updateUserById" keyProperty="userId">
+        UPDATE `user`
+        SET team_id        = #{team.teamId},
+            user_name      = #{userName},
+            user_password  = #{userPassword},
+            user_avatar    = #{userAvatar},
+            user_email     = #{userEmail},
+            team_authority = #{teamAuthority}
+        WHERE user_id = #{userId}
+    </update>
+    <delete id="deleteUserById">
+        DELETE
+        FROM `user`
+        WHERE user_id = ${userId}
+    </delete>
+
+</mapper>

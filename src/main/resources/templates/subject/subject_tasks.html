@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+
+    <title>任务管理</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/plugins/fontawesome-free/css/all.min.css}">
+    <!-- Theme style -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/dist/css/adminlte.min.css}">
+</head>
+
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <div th:replace="/common/nav::nav"></div>
+
+    <!-- Main Sidebar Container -->
+    <div th:replace="/common/sidebar_subject::sidebar ('task', ${subject})"></div>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">任务管理</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">课题页面</a></li>
+                            <li class="breadcrumb-item active">任务管理</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header ui-sortable-handle" style="cursor: move;">
+                                <h3 class="card-title">
+                                    <i class="ion ion-clipboard mr-1"></i>
+                                    课题待办事项列表
+                                </h3>
+
+                                <div class="card-tools">
+                                    <ul class="pagination pagination-sm float-right">
+                                        <li class="page-item"><a class="page-link" th:href="@{'/s/' + ${subject.getSubjectIdentification()} + '/tasks?pageIndex='+${tasks.pageNum - 1}}">«</a></li>
+                                        <th:block th:each="nav:${tasks.navigatepageNums}">
+                                            <li class="page-item" th:classappend="${nav==tasks.pageNum?'active':''}">
+                                                <a class="page-link" th:href="@{'/s/' + ${subject.getSubjectIdentification()} + '/tasks?pageIndex='+${nav}}"
+                                                   th:text="${nav}">1</a>
+                                            </li>
+                                        </th:block>
+                                        <li class="page-item"><a class="page-link" th:href="@{'/s/' + ${subject.getSubjectIdentification()} + '/tasks?pageIndex='+${tasks.pageNum + 1}}">»</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body p-0">
+                                <table class="table projects">
+                                    <thead>
+                                    <tr>
+                                        <th style="width: 30px">#</th>
+                                        <th>任务名称</th>
+                                        <th>优先级</th>
+                                        <th>状态</th>
+                                        <th style="width: 82px">
+                                            处理人
+                                        </th>
+                                        <th>创建时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="task, stat : ${tasks.list}">
+                                        <td th:text="${stat.index + 1}">1</td>
+                                        <td th:text="${task.getTaskTitle()}" >把冰箱打开</td>
+                                        <td>
+                                            <span class="badge badge-success"
+                                                  th:if="${task.getTaskRank() == 3}"> 低 </span>
+                                            <span class="badge badge-primary"
+                                                  th:if="${task.getTaskRank() == 2}"> 中 </span>
+                                            <span class="badge badge-warning"
+                                                  th:if="${task.getTaskRank() == 1}"> 高 </span>
+                                            <span class="badge badge-danger"
+                                                  th:if="${task.getTaskRank() == 0}">紧急</span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${task.getTaskStatus() == 0}">未开始</span>
+                                            <span th:if="${task.getTaskStatus() == 1}">处理中</span>
+                                            <span th:if="${task.getTaskStatus() == 2}">已完成</span>
+                                            <span th:if="${task.getTaskStatus() == 3}">已废弃</span>
+                                        </td>
+                                        <td>
+                                            <img class="table-avatar" th:alt="${task.getProcessor().getUserName()}"
+                                                 th:if="${task.getProcessor() != null}"
+                                                 th:src="@{${#objects.nullSafe(task.getProcessor().getUserAvatar(), '/img/user1.png')}}"
+                                                 th:title="${task.getProcessor().getUserName()}">
+                                            <span th:if="${task.getProcessor() == null}">未分配</span>
+                                        </td>
+                                        <td th:text="${#dates.format(task.getTaskCreatetime(), 'yyyy/MM/dd')}">2020-12-11</td>
+                                        <td>
+                                            <a th:href="@{'/s/' + ${subject.getSubjectIdentification()} + '/task/' + ${task.getTaskId()}}">查看</a>｜<a
+                                                data-toggle="modal" href="#"
+                                                th:data-target="'#deleteTask' + ${stat.index + 1}">删除</a>
+                                            <div aria-hidden="true" aria-labelledby="deleteModalLabel"
+                                                 class="modal fade" role="dialog"
+                                                 tabindex="-1" th:id="'deleteTask' + ${stat.index + 1}">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h4 class="modal-title" id="deleteModalLabel">删除任务</h4>
+                                                            <button aria-hidden="true" class="close"
+                                                                    data-dismiss="modal" type="button">&times;
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">确定要删除任务「<span
+                                                                th:text="${task.getTaskTitle()}"></span>」？
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <form method="post"
+                                                                  th:action="@{'/s/' + ${subject.getSubjectIdentification()} + '/tasks/delete'}">
+                                                                <input name="taskId" th:value="${task.getTaskId()}"
+                                                                       type="hidden">
+                                                                <a class="btn btn-primary text-white"
+                                                                   data-dismiss="modal">取消</a>
+                                                                <button class="btn btn-danger text-white" type="submit">
+                                                                    确认
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div><!-- /.modal-content -->
+                                                </div><!-- /.modal -->
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <p class="text-gray text-center mt-5 mb-5" th:if="${tasks.list.size() == 0}">
+                                    暂无任务，您可以添加新任务。</p>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer clearfix">
+                                <a class="btn btn-info float-right" th:href="@{'/s/' + ${subject.getSubjectIdentification()} + '/tasks/add'}">
+                                    <i class="fas fa-plus"></i> 添加任务
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    <div th:replace="/common/footer::footer"></div>
+</div>
+<!-- ./wrapper -->
+
+<!-- REQUIRED SCRIPTS -->
+
+<!-- jQuery -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/jquery/jquery.min.js}"></script>
+<!-- Bootstrap 4 -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<!-- AdminLTE App -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/dist/js/adminlte.min.js}"></script>
+<!-- Notification Count Update -->
+<script th:src="@{/js/notification.js}"></script>
+</body>
+
+</html>

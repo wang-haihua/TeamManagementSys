@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+
+    <title>课题组成员管理</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/plugins/fontawesome-free/css/all.min.css}">
+    <!-- Theme style -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/dist/css/adminlte.min.css}">
+</head>
+
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+    <!-- Navbar -->
+    <div th:replace="/common/nav::nav"></div>
+
+    <!-- Main Sidebar Container -->
+    <div th:replace="/common/sidebar_main::sidebar ('setting-member', ${team})"></div>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">课题组成员管理</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">个人主页</a></li>
+                            <li class="breadcrumb-item active">课题组成员管理</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content" >
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header" >
+                                    <h3 class="card-title" th:text="${team.getTeamName()}">打工人八组成员</h3>
+                                <div class="card-tools">
+                                    <ul class="pagination pagination-sm float-right">
+                                    <li class="page-item"><a class="page-link" th:href="@{/team/member(pageIndex=${users.pageNum-1})}">«</a></li>
+                                    <th:block th:each="nav:${users.navigatepageNums}">
+                                        <li class="page-item" th:classappend="${nav==users.pageNum?'active':''}">
+                                            <a class="page-link" th:href="@{'/team/member?pageIndex='+${nav}}"
+                                                                 th:text="${nav}">1</a>
+                                        </li>
+                                    </th:block>
+                                    <li class="page-item"><a class="page-link" th:href="@{/team/member(pageIndex=${users.pageNum+1})}">»</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body p-0">
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th style="width: 30px">#</th>
+                                        <th>姓名</th>
+                                        <th>邮箱</th>
+                                        <th style="width: 40px">权限</th>
+                                        <th class="text-center" style="width: 260px" th:if="${user.getTeamAuthority() != 0}">操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="u, userStat : ${users.list}">
+                                        <td th:text="${userStat.index+1}">1.</td>
+                                        <td th:text="${u.getUserName()}">雨田子雨廷</td>
+                                        <td th:text="${u.getUserEmail()}">yutianziyuting@hhh.com</td>
+                                        <td align="center">
+                                            <span class="badge bg-yellow"
+                                                  th:if="${u.getTeamAuthority() == 1}">创建者</span>
+                                            <span class="badge bg-primary"
+                                                  th:if="${u.getTeamAuthority() == 0}">成员</span>
+                                            <span class="badge bg-green" th:if="${u.getTeamAuthority() == 2}">管理员</span>
+                                        </td>
+                                        <td th:if="${user.getTeamAuthority() != 0}">
+                                            <a th:href="@{'/team/member/authority/' + ${u.getUserId()} + '?op=0'}"
+                                               th:if="${u.getTeamAuthority() == 2}">撤销管理员权限</a>
+                                            <a th:href="@{'/team/member/authority/' + ${u.getUserId()} + '?op=2'}"
+                                               th:if="${u.getTeamAuthority() == 0}">授予管理员权限</a>
+                                            <span th:if="${u.getTeamAuthority() != 1}">｜</span>
+                                            <a data-toggle="modal" href="#"
+                                               th:data-target="'#deleteTask' + ${userStat.index + 1}"
+                                               th:if="${u.getTeamAuthority() != 1}">移除成员</a>
+                                            <div aria-hidden="true" aria-labelledby="deleteModalLabel"
+                                                 class="modal fade" role="dialog"
+                                                 tabindex="-1" th:id="'deleteTask' + ${userStat.index + 1}">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h4 class="modal-title" id="deleteModalLabel">移除成员</h4>
+                                                            <button aria-hidden="true" class="close"
+                                                                    data-dismiss="modal" type="button">&times;
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">确定要移除成员「<span
+                                                                th:text="${u.getUserName()}"></span>」？
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <a class="btn btn-primary text-white"
+                                                               data-dismiss="modal">取消</a>
+                                                            <a class="btn btn-danger text-white"
+                                                               th:href="@{'/team/member/remove/' + ${u.getUserId()}}">
+                                                                确认
+                                                            </a>
+                                                        </div>
+                                                    </div><!-- /.modal-content -->
+                                                </div><!-- /.modal -->
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    <div th:replace="/common/footer::footer"></div>
+</div>
+<!-- ./wrapper -->
+
+<!-- REQUIRED SCRIPTS -->
+
+<!-- jQuery -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/jquery/jquery.min.js}"></script>
+<!-- Bootstrap 4 -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<!-- AdminLTE App -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/dist/js/adminlte.min.js}"></script>
+<!-- Notification Count Update -->
+<script th:src="@{/js/notification.js}"></script>
+</body>
+
+</html>

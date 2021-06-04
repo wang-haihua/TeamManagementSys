@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.dagongren8.teamplus.mapper.TaskMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.dagongren8.teamplus.entity.Task">
+        <id column="task_id" property="taskId" />
+        <result column="task_title" property="taskTitle" />
+        <result column="task_content" property="taskContent" />
+        <result column="task_rank" property="taskRank" />
+        <result column="task_status" property="taskStatus" />
+        <result column="task_duration" property="taskDuration" />
+        <result column="task_createtime" property="taskCreatetime" />
+        <result column="task_starttime" property="taskStarttime" />
+        <result column="task_deadline" property="taskDeadline" />
+        <result column="task_endtime" property="taskEndtime" />
+        <association property="subject" javaType="cn.dagongren8.teamplus.entity.Subject">
+            <id column="subject_id" property="subjectId" />
+            <result column="subject_name" property="subjectName" />
+            <result column="subject_identification" property="subjectIdentification" />
+            <result column="subject_description" property="subjectDescription" />
+            <result column="subject_createtime" property="subjectCreatetime" />
+        </association>
+        <association property="processor" javaType="cn.dagongren8.teamplus.entity.User">
+            <id column="user_id" property="userId"/>
+            <result column="user_name" property="userName"/>
+            <result column="user_password" property="userPassword"/>
+            <result column="user_avatar" property="userAvatar"/>
+            <result column="user_email" property="userEmail"/>
+            <result column="team_authority" property="teamAuthority"/>
+            <result column="user_createtime" property="userCreatetime"/>
+        </association>
+        <!--   TODO：遗留问题，Creator其他属性实装     -->
+        <association property="taskCreator" javaType="cn.dagongren8.teamplus.entity.User">
+            <id column="task_creator" property="userId"/>
+            <result column="u2.user_name" property="userName"/>
+            <result column="u2.user_password" property="userPassword"/>
+            <result column="u2.user_avatar" property="userAvatar"/>
+            <result column="u2.user_email" property="userEmail"/>
+            <result column="u2.team_authority" property="teamAuthority"/>
+            <result column="u2.user_createtime" property="userCreatetime"/>
+        </association>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        task_id, subject_id, user_id, task_creator, task_title, task_content, task_rank,  task_status, task_duration, task_createtime, task_starttime, task_deadline, task_endtime
+    </sql>
+
+    <select id="getSubjectTasks" resultMap="BaseResultMap">
+        SELECT *
+        FROM task
+                 natural join `subject`
+                 left join user u on task.user_id = u.user_id
+        where task.subject_id = #{subjectId}
+    </select>
+    <select id="getUserTasks" resultMap="BaseResultMap">
+        SELECT *
+        FROM task
+                 natural join `subject`
+                 left join user u on task.user_id = u.user_id
+        where task.user_id = #{userId}
+    </select>
+    <select id="getTaskById" resultMap="BaseResultMap">
+        SELECT *
+        FROM task
+                 natural join `subject`
+                 left join user u on task.user_id = u.user_id
+        where task_id = #{taskId}
+    </select>
+    <insert id="insertTask" useGeneratedKeys="true" keyProperty="taskId">
+        INSERT INTO task(subject_id, user_id, task_creator, task_title, task_content, task_rank, task_status, task_duration, task_starttime, task_deadline, task_endtime)
+        VALUES (#{subject.subjectId},#{processor.userId},#{taskCreator.userId}, #{taskTitle},#{taskContent},#{taskRank},#{taskStatus},#{taskDuration},#{taskStarttime},#{taskDeadline},#{taskEndtime})
+    </insert>
+    <update id="updateTaskById"  keyProperty="taskId">
+        UPDATE task
+        SET subject_id = #{subject.subjectId},
+            user_id = #{processor.userId},
+            task_creator = #{taskCreator.userId},
+            task_title = #{taskTitle},
+            task_content = #{taskContent},
+            task_rank = #{taskRank},
+            task_status = #{taskStatus},
+            task_duration = #{taskDuration},
+            task_starttime = #{taskStarttime},
+            task_deadline = #{taskDeadline},
+            task_endtime = #{taskEndtime}
+        WHERE task_id = #{taskId}
+    </update>
+    <delete id="deleteTaskById">
+        DELETE
+        FROM task
+        WHERE task_id = #{taskId}
+    </delete>
+
+</mapper>

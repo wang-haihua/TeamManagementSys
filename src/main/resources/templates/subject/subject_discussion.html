@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+
+    <title>课题讨论</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/plugins/fontawesome-free/css/all.min.css}">
+    <!-- Theme style -->
+    <link rel="stylesheet" th:href="@{/webjars/AdminLTE/3.0.0/dist/css/adminlte.min.css}">
+</head>
+
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+
+    <!-- Navbar -->
+    <div th:replace="/common/nav::nav"></div>
+
+    <!-- Main Sidebar Container -->
+    <div th:replace="/common/sidebar_subject::sidebar ('discussion', ${subject})"></div>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0 text-dark">课题讨论</h1>
+                    </div><!-- /.col -->
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">课题页面</a></li>
+                            <li class="breadcrumb-item active">课题讨论</li>
+                        </ol>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card direct-chat direct-chat-primary">
+                            <div class="card-header ui-sortable-handle" style="cursor: move;">
+                                <h3 class="card-title">课题讨论</h3>
+
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                                <!-- Conversations are loaded here -->
+                                <div class="direct-chat-messages" style="height: 380px">
+                                    <!-- Message. Default to the left -->
+                                    <th:block th:each="a : ${messages}">
+                                        <div class="direct-chat-msg"
+                                             th:if="${a.getUser().getUserId() != user.getUserId()}">
+                                            <div class="direct-chat-infos clearfix">
+                                                <span class="direct-chat-name float-left"
+                                                      th:text="${a.getUser().getUserName()}">Alexander Pierce</span>
+                                                <span class="direct-chat-timestamp float-right"
+                                                      th:text="${#dates.format(a.getMessageCreatetime(), 'yyyy年MM月dd日 HH:mm:ss')}">23 Jan 2:00 pm</span>
+                                            </div>
+                                            <!-- /.direct-chat-infos -->
+                                            <img class="direct-chat-img"
+                                                 th:src="@{${#objects.nullSafe(a.getUser().getUserAvatar(), '/img/user1.png')}}">
+                                            <!-- /.direct-chat-img -->
+                                            <div class="direct-chat-text" th:text="${a.getMessageContent()}">
+                                                Is this template really for free? That's unbelievable!
+                                            </div>
+                                            <!-- /.direct-chat-text -->
+                                        </div>
+                                        <!-- /.direct-chat-msg -->
+
+                                        <!-- Message to the right -->
+                                        <div class="direct-chat-msg right"
+                                             th:if="${a.getUser().getUserId() == user.getUserId()}">
+                                            <div class="direct-chat-infos clearfix">
+                                                <span class="direct-chat-name float-right"
+                                                      th:text="${a.getUser().getUserName()}">Sarah Bullock</span>
+                                                <span class="direct-chat-timestamp float-left"
+                                                      th:text="${#dates.format(a.getMessageCreatetime(), 'yyyy年MM月dd日 HH:mm:ss')}">23 Jan 2:05 pm</span>
+                                            </div>
+                                            <!-- /.direct-chat-infos -->
+                                            <img class="direct-chat-img"
+                                                 th:src="@{${#objects.nullSafe(a.getUser().getUserAvatar(), '/img/user1.png')}}">
+                                            <!-- /.direct-chat-img -->
+                                            <div class="direct-chat-text" th:text="${a.getMessageContent()}">
+                                                You better believe it!
+                                            </div>
+                                            <!-- /.direct-chat-text -->
+                                        </div>
+                                        <!-- /.direct-chat-msg -->
+                                    </th:block>
+
+                                </div>
+                                <!--/.direct-chat-messages-->
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                <form method="post" th:action="@{'/s/' + ${subject.getSubjectIdentification()} + '/discussion/add'}">
+                                    <div class="input-group">
+                                        <input class="form-control" name="content" placeholder="Type Message ..."
+                                               type="text">
+                                        <span class="input-group-append">
+                                        <input class="btn btn-primary" type="submit" value="发送">
+                                        </span>
+                                    </div>
+                                </form>
+                            </div>
+                            <!-- /.card-footer-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    <div th:replace="/common/footer::footer"></div>
+</div>
+<!-- ./wrapper -->
+
+<!-- REQUIRED SCRIPTS -->
+
+<!-- jQuery -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/jquery/jquery.min.js}"></script>
+<!-- Bootstrap 4 -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<!-- AdminLTE App -->
+<script th:src="@{/webjars/AdminLTE/3.0.0/dist/js/adminlte.min.js}"></script>
+<!-- Notification Count Update -->
+<script th:src="@{/js/notification.js}"></script>
+</body>
+
+</html>
